@@ -297,13 +297,13 @@ this.SearchView = Backbone.View.extend({
                 var EntitySearch = get_radio_value("opciones");
                 switch (EntitySearch) {
                     case 'autores':
-                        t__ = "P";
+                        t__ = "Agent";
                         break;
                     case 'documentos':
-                        t__ = "D";
+                        t__ = "BibliographicResource";
                         break;
                     case 'colecciones':
-                        t__ = "C";
+                        t__ = "Collection";
                         break;
                 }
                 if (term != null && term.trim().length > 3) {

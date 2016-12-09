@@ -1,0 +1,55 @@
+{
+        "Repositories":[
+            {"Name":"cepalstat", "Classes":["Indicator"]},
+            {"Name":"biblioguias", "Classes":["Agent","Libguide"]},
+            {"Name":"repositorio", "Classes":["Agent","Site","Collection","Project","BibliographicResource","Workarea"]}
+        ],
+	"MainClasses":[
+		{"Name":"Libguide", 
+		 "URI": "http://dbpedia.org/resource/Guide_to_information_sources", 
+		 "AutocompleteProperties":[
+						"http://purl.org/dc/terms/title",
+						"http://purl.org/dc/terms/subject"
+		]},
+		{"Name":"Agent", 
+		 "URI": "http://xmlns.com/foaf/0.1/Agent", 
+		 "AutocompleteProperties":[
+						"http://xmlns.com/foaf/0.1/name"
+		]},
+		{"Name":"Site", 
+		 "URI": "http://www.w3.org/ns/org#Site", 
+		 "AutocompleteProperties":[
+						"http://www.w3.org/2000/01/rdf-schema#label"
+		]},
+		{"Name":"Collection", 
+		 "URI": "http://purl.org/dc/dcmitype/Collection", 
+		 "AutocompleteProperties":[
+						"http://www.w3.org/2000/01/rdf-schema#label"
+		]},
+		{"Name":"Project", 
+		 "URI": "http://vocab.ox.ac.uk/projectfunding#Project", 
+		 "AutocompleteProperties":[
+						"http://www.w3.org/2000/01/rdf-schema#label"
+		]},
+		{"Name":"BibliographicResource", 
+		 "URI": "http://purl.org/dc/terms/BibliographicResource", 
+		 "AutocompleteProperties":[
+						"http://purl.org/dc/terms/title",
+						"http://purl.org/dc/terms/subject"
+		]},
+		{"Name":"Workarea", 
+		 "URI": "http://ns.nature.com/terms/Subject", 
+		 "AutocompleteProperties":[
+						"http://www.w3.org/2000/01/rdf-schema#label"
+		]},
+		{"Name":"Indicator", 
+		 "URI": "http://purl.org/linked-data/cube#DataSet", 
+		 "AutocompleteProperties":[
+						"http://vivoweb.org/ontology/core#freetextKeyword",
+						"http://www.w3.org/2000/01/rdf-schema#label"
+		]}
+
+	]
+
+
+}

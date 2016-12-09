@@ -147,6 +147,19 @@ function merge_(obj1, obj2) {
 }
 
 
+Array.prototype.getUnique = function(){
+   var u = {}, a = [];
+   for(var i = 0, l = this.length; i < l; ++i){
+      if(u.hasOwnProperty(this[i])) {
+         continue;
+      }
+      a.push(this[i]);
+      u[this[i]] = 1;
+   }
+   return a;
+}
+
+
 String.prototype.hashCode = function () {
     var a = 0, b, c, d;
     if (0 === this.length)
@@ -612,6 +625,8 @@ var num_auto=0;
         return parser.text('every 1 seconds');
       },
       job: function() {
+        var ConfigInfo = Meteor.call('ConfigInfo');
+          
 	var endp = Endpoints.find().fetch();
         for (; ; ) {
             var pend = Cache.find({queue: {$exists: true}}, {sort: {qord: -1}, limit: 1}).fetch();
@@ -632,27 +647,20 @@ var num_auto=0;
             var lsend = sug.lsend;
             var cont = sug.cont;
             var resp = sug.resp;
-            var spar = "select distinct ?p ?Score { (?e ?Score ?p) <http://jena.apache.org/text#query> (<---> '___' 3) } order by desc(?Score)";
+            var spar = "select distinct ?p ?Score { (?e ?Score ?p) <http://jena.apache.org/text#query> (<---> '___' 1000) . ?e a <%%%>. } order by desc(?Score) limit 3";
             spar = spar.replace(new RegExp("___", "g"), query);
             var proper = [];
-            switch (clas_) {
-                case 'P':
-                    proper.push('http://xmlns.com/foaf/0.1/name');
-                    break;
-                case 'D':
-                    proper.push('http://purl.org/dc/terms/subject');
-                    proper.push('http://purl.org/dc/terms/title');
-                    break;
-                case 'C':
-                    proper.push('http://purl.org/dc/terms/description');
-                    break;
-                case 'T':
-                    proper.push('http://xmlns.com/foaf/0.1/name');
-                    proper.push('http://purl.org/dc/terms/subject');
-                    proper.push('http://purl.org/dc/terms/description');
-                    proper.push('http://purl.org/dc/terms/title');
-                    break;
+            var MC=ConfigInfo.MainClasses;
+            for (var qm=0; qm<MC.length; qm++){
+                if (MC[qm].Name==clas_ || clas_=="T"){
+                    var ls__y = MC[qm].AutocompleteProperties;
+                    for (var qmm=0; qmm<ls__y.length; qmm++ ){
+                        proper.push({p: ls__y[qmm], c: MC[qm].URI, cn:MC[qm].Name});
+                    }
+                }
             }
+            
+            
             if (lsend == null) {
                 var foo = [];
                 for (var i = 0; i < endp.length; i++) {
@@ -663,15 +671,37 @@ var num_auto=0;
             var endpoint_i = Math.floor(cont / proper.length);
             var prope_i = cont % proper.length;
             var endpoint = endp[lsend[endpoint_i]];
-            var _spar = spar.replace(new RegExp("---", "g"), proper[prope_i]);
+            var _spar = spar.replace(new RegExp("---", "g"), proper[prope_i].p);
+            _spar = _spar.replace(new RegExp("%%%", "g"), proper[prope_i].c);
             var objQuery={sparql: _spar, ep: endpoint.endpoint, gr: endpoint.graphURI};
-            var result = Meteor.call('doQueryCacheStats', objQuery);
+            
+            var result = {resultSet:{value:'{  "head": {    "vars": [ "p" , "Score" ]  } ,  "results": {    "bindings": [          ]  }}'}};
+                    
+            var cendp = ConfigInfo.Repositories.filter(function (a){
+                return a.Name==endpoint.name;
+            });
+            cendp=cendp[0];
+            var cvarlisc=cendp.Classes.filter(function (a){
+                return a==proper[prope_i].cn;
+            });
+            
+            if (cvarlisc.length!=0){
+                result=Meteor.call('doQueryCacheStats', objQuery);    
+                
+            }
+            
+            
+
+
+            
             
             if (result == null || result == undefined || result.resultSet == null || result.resultSet== undefined || result.resultSet.value == null || result.resultSet.value== undefined )
             {
                 console.log('Error Sugg_ '+JSON.stringify(objQuery));
                 continue;
             }
+            
+            
             var r = result.resultSet.value;
             var lsp = JSON.parse(r).results.bindings;
             for (var k = 0; k < lsp.length; k++) {
@@ -787,7 +817,7 @@ Api.addRoute('sparql', {authRequired: false}, {
         Meteor.methods({
             eventsOnHooksInit: function () {},
             updateStats: function () {
-
+                return;
                 var __mongo_stats = [];
                 var endp = Endpoints.find().fetch();
                 //Numero totales
@@ -1861,7 +1891,7 @@ Api.addRoute('sparql', {authRequired: false}, {
                 if (text == null || lsend != null && lsend.length == 0) {
                     return {data: [], cacheable: true};
                 }
-                var text2 = text.removeDiacritics().keyword().trim().toLowerCase().replace(/[\.\+\/\\\|\*`\~,!@\#$%:^&\(\)\[\]\{\}\?\<\>\;=\'\"´-]+/g, " ");
+                var text2 = text.removeDiacritics().keyword().trim().toLowerCase().replace(/[\.\+\/\\\|\*`\~,!@\#$%:^&\(\)\[\]\{\}\?\<\>\;=\'\"´-]+/g, " ").trim();
                 if (text2 === "") {
                     return {data: [], cacheable: true};
                 }
@@ -1915,7 +1945,7 @@ Api.addRoute('sparql', {authRequired: false}, {
                             }
 
                         }
-                        Meteor._sleepForMs(500);
+                        Meteor._sleepForMs(1000);
                     }
 
                 }
@@ -2494,7 +2524,12 @@ Api.addRoute('sparql', {authRequired: false}, {
 
                  return "Error";
 
-              }
+              }, 
+                ConfigInfo: function (){
+                    var myjson = {};
+                    myjson = JSON.parse(Assets.getText("config.json"));
+                    return myjson;
+                }
               
  
  
