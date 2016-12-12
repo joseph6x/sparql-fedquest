@@ -80,7 +80,7 @@ this.IndexView = Backbone.View.extend({
 
 
 
-
+/*
 
   var prev;
   $("#documentos").click(function () {   
@@ -108,7 +108,7 @@ this.IndexView = Backbone.View.extend({
     var val = 'colecciones';
     prev = selec (prev , val) ;
  
-  });
+  });*/
 
  $("#lang-esp").click(function () {   
   //language ();
@@ -146,18 +146,6 @@ $("#lang-en").click(function () {
 });
 
 
- function selec ( prev , val) {
-    if  ( prev == $('input:radio[id='+val+']').val () ) {
-   $(".recurso").text (lang.lang ("resources-search"));
-   prev = "";
-   $('input:radio[id='+val+']').attr('checked',false);
-   }
-   else {
-    $(".recurso").text (lang.lang( "search-option") + lang.lang (val.charAt(0).toUpperCase()+val.slice(1)));
-    prev = $('input:radio[id='+val+']').val ();
-    }
-    return prev;
- }
 
 
  function loadreco () {

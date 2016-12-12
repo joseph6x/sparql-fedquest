@@ -61,6 +61,27 @@ if (Meteor.isClient) {
     this.App.resultCollectionSL = new Meteor.Collection(null);
     this.App.resultCollection2 = new Meteor.Collection(null);
     this.App.resultCollection3 = new Meteor.Collection(null);
+
+
+         var types = [{ Tipo :"documentos" , Imagen:"/images/documentob.png" , Description:"Recurso Bibliográfico" , URI:"http://purl.org/dc/terms/BibliographicResource"  } , {Tipo:"autores" , Imagen:"/iconos/agentec.png" , Description:"Autores" , URI:"http://xmlns.com/foaf/0.1/Agent" } , {Tipo:"colecciones" , Imagen:"/images/collectioncolor.png" , Description:"Colecciones" , URI:"http://purl.org/ontology/bibo/Collection" } ];
+            var rep1 =   { Tipo :"oficina" , Imagen:"/iconos/officeiconc.png" , Description:"Oficina" , URI: "http://www.w3.org/ns/org#Site" };
+            var rep2 =   { Tipo :"series" , Imagen:"/iconos/SeriesiconC.png" , Description:"Series" , URI: "http://www.cepal.org/vocabulary#Series_Cepal" }; 
+            var rep3 =   { Tipo :"proyecto" , Imagen:"/iconos/ProjecticonC.png" , Description:"Proyecto" , URI: "http://vocab.ox.ac.uk/projectfunding#Project" }; 
+            var rep4 =   { Tipo :"area" , Imagen:"/iconos/areaicon.png" , Description:"Área de trabajo"  , URI: "http://ns.nature.com/terms/Subject" }; 
+            var g1 = { Tipo :"guide" , Imagen:"/images/documentob.png" , Description:"Guiá" , URI: "http://dbpedia.org/resource/Guide_to_information_sources" };
+            var ind1 = { Tipo :"indicador" , Imagen:"/images/documentob.png" , Description:"Indicador" , URI: "http://purl.org/linked-data/cube#DataSet" };
+            types.push (rep1);
+            types.push (rep2);
+            types.push (rep3);
+            types.push (rep4);
+            types.push (g1);
+            types.push (ind1);
+
+
+
+
+
+
     this.App.FindRepository = (function (uri) {
 
         var answer = {};
@@ -1467,7 +1488,8 @@ if (Meteor.isClient) {
 
                     entities = _.pluck(entities, 'subjects');
                     //   console.log ("Pluck");
-                    //   console.log (entities);
+                     console.log ("----ENTIDADES ENCONTRADAS");
+                     //console.log (entities);
                     //console.log('==encontrados: ' + entities.length);
                     var values = [];
                     for (var i = 0; i < entities.length; i++) {
@@ -1478,6 +1500,7 @@ if (Meteor.isClient) {
                     graph.endpointEntities = _.uniq(values, false, function (obj) {
                         return obj.fullName;
                     });
+                    console.log ( graph.endpointEntities);
                     graph.endpointProperties = properties;
                     /*      if (graph.endpointProperties [0]  === undefined) 
                      {
@@ -1538,7 +1561,7 @@ if (Meteor.isClient) {
                             graph.endpointEntities[j].dim = "col-xs-6 col-sm-4 col-md-3";
                         }
                         // Para evitar que se coloque en el ultimo lugar de la fila cuando ocupa dos cuadros
-                        if (j % 3 == 0 && name.length > 10) {
+                        if (j % 3 == 0 && name.length > 10 && j!=0) {
                             var aux = graph.endpointEntities[j - 1];
                             graph.endpointEntities[j - 1] = graph.endpointEntities[j];
                             graph.endpointEntities[j] = aux;
@@ -1588,8 +1611,8 @@ if (Meteor.isClient) {
             return Session.get("counter");
         }
     });
-//*
-
+//* 
+    
 
     Template.graph.helpers({
         Numresultgraph: function () {
@@ -1803,6 +1826,22 @@ if (Meteor.isClient) {
             return selecc;
             // return Recomendation.find({ 'userid': Meteor.userId() }).fetch();
 
+        } , resourcesavailable: function (){
+           /* var types = [{ Tipo :"documentos" , Imagen:"/images/documentob.png" , Description:"Recurso Bibliográfico" , URI:"http://purl.org/dc/terms/BibliographicResource"  } , {Tipo:"autores" , Imagen:"/iconos/agentec.png" , Description:"Autores" , URI:"http://xmlns.com/foaf/0.1/Agent" } , {Tipo:"colecciones" , Imagen:"/images/collectioncolor.png" , Description:"Colecciones" , URI:"http://purl.org/ontology/bibo/Collection" } ];
+            var rep1 =   { Tipo :"oficina" , Imagen:"/iconos/officeiconc.png" , Description:"Oficina" , URI: "http://www.w3.org/ns/org#Site" };
+            var rep2 =   { Tipo :"series" , Imagen:"/iconos/SeriesiconC.png" , Description:"Series" , URI: "http://www.cepal.org/vocabulary#Series_Cepal" }; 
+            var rep3 =   { Tipo :"proyecto" , Imagen:"/iconos/ProjecticonC.png" , Description:"Proyecto" , URI: "http://vocab.ox.ac.uk/projectfunding#Project" }; 
+            var rep4 =   { Tipo :"area" , Imagen:"/iconos/areaicon.png" , Description:"Área de trabajo"  , URI: "http://ns.nature.com/terms/Subject" }; 
+            var g1 = { Tipo :"guide" , Imagen:"/images/documentob.png" , Description:"Guiá" , URI: "http://dbpedia.org/resource/Guide_to_information_sources" };
+            var ind1 = { Tipo :"indicador" , Imagen:"/images/documentob.png" , Description:"Indicador" , URI: "http://purl.org/linked-data/cube#DataSet" };
+            types.push (rep1);
+            types.push (rep2);
+            types.push (rep3);
+            types.push (rep4);
+            types.push (g1);
+            types.push (ind1);*/
+            return  types;
+
         }
     });
 
@@ -1956,6 +1995,8 @@ if (Meteor.isClient) {
                 return "glyphicon glyphicon-chevron-down";
             }
 
+        }, resourcesavailable : function (){  
+          return types; 
         },
         suggestedQueries: function () {
 

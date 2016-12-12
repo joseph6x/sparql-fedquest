@@ -77,6 +77,168 @@ $("#lang-en").click(function () {
   }
 });
 
+ updatebuttons = function  (e ) {
+   console.log (e);
+  // console.log (a);
+   // console.log (e.target.attributes[1].value);
+  //  var select = e.target.attributes[1].value;
+     var prev = "";
+     selec (prev , e );
+ };
+ 
+ updatebuttons2 = function  (e ) {
+   console.log (e);
+  // console.log (a);
+   // console.log (e.target.attributes[1].value);
+  //  var select = e.target.attributes[1].value;
+     var prev = "";
+     selec2 (prev , e );
+ };
+
+ function selec ( prev , val) {
+   var opt = $("input:radio[name='opciones']") ;
+ /*  console.log ( opt);
+   console.log (opt[1]);
+   console.log (opt[1].value);
+   console.log (opt.length);*/
+
+    var prev = $("input[name='opciones']:checked").val();
+    console.log ("seleccionado");
+    console.log (prev);
+    console.log (val);
+     
+    if ( typeof prev === 'undefined'){
+    prev = '';
+    }
+ 
+
+   for (var i = 0; i<opt.length ;i++ ){
+       var actual = opt[i].value;
+     console.log (actual);
+     var q = "."+actual;
+ //    $('input:radio[id='+actual+']').attr('checked',false);
+     
+      $(q).css('-webkit-box-shadow','');
+      $(q).css('-moz-box-shadow', '');
+      $(q).css('box-shadow', '');
+      if (actual != val){
+      $(q).attr('select','0');
+      }
+     // $('input:radio[id='+opt[i].value+']').attr('checked');
+     /*console.log ("comprobando"+opt[i].value);*/
+    /* var state =  $('input:radio[id='+opt[i].value+']').attr('checked');
+     console.log (state);*/
+   }   
+  /* if ( val == prev ) { 
+    //   $('input:radio[id='+val+']').attr('checked',false);
+        $(".recurso").text (lang.lang ("resources-search"));
+
+   } else {*/
+
+          var select =  $("."+val).attr('select');
+       console.log (select);
+     
+    if (select == "1" ){
+         $(".recurso").text (lang.lang ("resources-search"));
+         $("."+val).attr('select','0');
+     // $('input:radio[id='+prev+']').attr('checked',false);
+     // $('input:radio[id='+prev+']').removeAttr( "checked" );
+      }else {
+
+   //   $('input:radio[id='+val+']').attr('checked', true);
+    //  $("'."+val+"'").attr('style', '-webkit-box-shadow:0px 0px 25px 5px #000;-moz-box-shadow:0px 0px 25px 5px #000;box-shadow:0px 0px 25px 5px #000');
+      $("."+val).css('-webkit-box-shadow','0px 0px 25px 5px #000');
+      $("."+val).css('-moz-box-shadow', '0px 0px 25px 5px #000');
+      $("."+val).css('box-shadow', '0px 0px 25px 5px #000');
+ 
+     // $('label[class='+val+']').attr('style', '-webkit-box-shadow:0px 0px 25px 5px #000;-moz-box-shadow:0px 0px 25px 5px #000;box-shadow:0px 0px 25px 5px #000');
+      
+       $("."+val).attr('select','1');
+      $(".recurso").text (lang.lang( "search-option") + lang.lang (val.charAt(0).toUpperCase()+val.slice(1)));
+      }
+   //}
+/*
+      if ( val == prev ) {
+          console.log ();
+               $('input:radio[id='+opt[i].value+']').attr('checked',false);
+                $(".recurso").text (lang.lang ("resources-search"));
+         } 
+          if ( val != $('input:radio[id='+actual+']').val ())
+         { 
+                $('input:radio[id='+actual+']').attr('checked',false);
+         } else if (val ==  $('input:radio[id='+actual+']').val () ) {
+      $(".recurso").text (lang.lang( "search-option") + lang.lang (val.charAt(0).toUpperCase()+val.slice(1)));
+    //  prev = $('input:radio[id='+val+']').val ();
+     $('input:radio[id='+opt[i].value+']').attr('checked',true);
+         }*/
+/*
+    if  ( prev == $('input:radio[id='+val+']').val () ) {
+   $(".recurso").text (lang.lang ("resources-search"));
+   prev = "";
+   $('input:radio[id='+val+']').attr('checked',false);
+   }
+   else {
+
+    $(".recurso").text (lang.lang( "search-option") + lang.lang (val.charAt(0).toUpperCase()+val.slice(1)));
+    prev = $('input:radio[id='+val+']').val ();
+     $('input:radio[id='+val+']').attr('checked',true);
+    }
+    return prev;*/
+ }
+
+ function selec2 ( prev , val) {
+   var opt = $("input:radio[name='opciones']") ;
+ /*  console.log ( opt);
+   console.log (opt[1]);
+   console.log (opt[1].value);
+   console.log (opt.length);*/
+
+    var prev = $("input[name='opciones']:checked").val();
+    console.log ("seleccionado");
+    console.log (prev);
+    console.log (val);
+     
+    if ( typeof prev === 'undefined'){
+    prev = '';
+    }
+ 
+
+   for (var i = 0; i<opt.length ;i++ ){
+       var actual = opt[i].value;
+     console.log (actual);
+     var q = "."+actual;
+
+      $(q).css('-webkit-box-shadow','');
+      $(q).css('-moz-box-shadow', '');
+      $(q).css('box-shadow', '');
+      if (actual != val){
+      $(q).attr('select','0');
+      }
+
+   }   
+
+
+          var select =  $("."+val).attr('select');
+       console.log (select);
+     
+    if (select == "1" ){
+         $(".recurso").text (lang.lang ("resources-search"));
+         $("."+val).attr('select','0');
+
+      }else {
+
+  
+      $("."+val).css('-webkit-box-shadow','0px 0px 25px 3px #E6E6E6');
+      $("."+val).css('-moz-box-shadow', '0px 0px 25px 3px #E6E6E6');
+      $("."+val).css('box-shadow', '0px 0px 25px 3px #E6E6E6');
+ 
+      
+       $("."+val).attr('select','1');
+      $(".recurso").text (lang.lang( "search-option") + lang.lang (val.charAt(0).toUpperCase()+val.slice(1)));
+      }
+
+ }
+
 search_query = function (e) {
 
     Session.set('welcome', "Hola");
@@ -96,7 +258,8 @@ search_query = function (e) {
 
    // var en = Endpoints.find({name: obj.attributes['data-endpoint'].value}).fetch()[0]
     var v1 = encodeURIComponent($('input:text[name=terms]').val());
-    var v2 = encodeURIComponent($('input:radio[name=opciones]:checked').val());
+    //var v2 = encodeURIComponent($('input:radio[name=opciones]:checked').val());
+    var v2 = encodeURIComponent($('label[select="1"]').attr('tipo'));
     var v3 = encodeURIComponent(result.name);
     window.open('/search/' + v1 + '/' + v2 + '/' + v3 ,"_self" );
     });

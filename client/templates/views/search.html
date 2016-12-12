@@ -9,14 +9,25 @@
 	    </div>
 		<div class="search-area text-center">
 	    <div class="row">
-		<div class="col-md-10">
+		<div class="col-md-12">
 		<div class="Search-bar input-group"> 
 		  <input type="text" value="" name="terms" onclick="Session.set('auxAct',Session.get('auxAct')+1);" onkeydown="Session.set('auxAct',Session.get('auxAct')+1); if(event.keyCode == 13){$('.runSearch').click();}" class="required form-control textToSearch" id="mce-text" placeholder={{lang "placeholder-search"}} required>
                           <span class="input-group-btn">
                             <input type="button" value={{lang "search"}} name="subscribe" id="mc-embedded-subscribe" class="btn btn-default runSearch" >                   
-						 </span>
+	
+						 </span> 
+
+
+	    </div> 
+			<!--<div class="col-md-2 col-md-offset-4"> 
+		<select class="selectpicker">
+ 		<option>Mustard</option>
+  		<option>Ketchup</option>
+ 		<option>Relish</option>
+	    </select>
 		</div>
-		</div>
+	    </div> -->
+		<!--
 		<form class="result-options">
 		   <div class=col-md-2> 
 			  <div class="cc-selector"> 
@@ -29,8 +40,22 @@
 			  <label class="opciones-cc colecciones" for="colecciones2" data-toggle="tooltip" title={{lang "tip-collection"}}></label>
 		      </div>
 			  </div>
-			</form >
+			</form > -->
+			 <form>
+       <div class="col-md-12" style="text-align: left; margin-top: -10px;margin-bottom: -5px;"> 
+        <div class="cc-selector"> 
+        {{#each resourcesavailable}}
+        <input id="{{Tipo}}" type="radio" name="opciones" value="{{Tipo}}"  />
+        <label style="background-image:url('{{Imagen}}');width: 35px;height: 35px;" tipo= "{{Tipo}}" class="opciones-cc {{Tipo}}" select="0" onclick="updatebuttons2('{{Tipo}}')" for="{{Imagen}}" data-toggle="tooltip" title="{{Description}}"></label>
+        {{/each}}
+        </div> 
+        </div>
+            </form>
+        </div>
 		</div>
+
+          
+
 		</div>
 		
 		<div class="title-seach row">

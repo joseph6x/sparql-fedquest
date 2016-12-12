@@ -2308,7 +2308,8 @@ Api.addRoute('sparql', {authRequired: false}, {
                 } else {
                     console.log("Skipping Graph Schema fetching process for endpoint: " + endpointURI + ' <' + defaultGraph + '>');
                 }
-                Meteor.call('updateStats');
+                // Actualizar estadisticas
+               // Meteor.call('updateStats');
                 return response;
             },
             updateBaseEndpoint: function (endpointURI, defaultGraph) {
@@ -2501,7 +2502,7 @@ Api.addRoute('sparql', {authRequired: false}, {
         });
 
         //Update Prefixes schema on every server startup
-        //Meteor.call('updatePrefixes');
+        Meteor.call('updatePrefixes');
         SyncedCron.start();
 
     });

@@ -12,17 +12,100 @@ var d3tip = require('d3-tip')(d3);
   initialize: function(v1, v2 , v3) {
     var me;
     me = this;
+   // v1 =  "http://localhost:8080/biblioguias/libguide/159504";
+   // v1= "http://localhost:8080/cepalstat/indicador/Indicador_2299";
+    v1 = "http://localhost:8080/repositorio/document/10001";
+   
+   // v2 =  "http://localhost:8891/biblioguias/sparql";
+   // v2 = "http://localhost:8891/cepalstat/sparql";
+    v2 = "http://localhost:8891/repositorio/sparql";
+    
+  //  v3 =  "http://localhost:8080/biblioguias/";
+    v3 = "http://localhost:8080/repositorio/";
+  //  v3 = "http://localhost:8080/cepalstat/";
 
+    //http://localhost:8080/biblioguias/person/MIRIAN_RAMIREZ
     //var vv1=v1;
+  /*  var deslabel = [];
+    deslabel["http://purl.org/ontology/bibo/Document"] = "dcterms:title";*/
     Session.set('v1', v1);
     Session.set('v2', v2);
     Session.set('v3', v3);
+    var img =  {};
+    img['http://dbpedia.org/resource/Guide_to_information_sources'] = "/images/documento.png";
+    img['http://xmlns.com/foaf/0.1/Person'] = "/images/author-default.png";
+    img['http://xmlns.com/foaf/0.1/Organization'] = "/iconos/orgiconc.png";
+    img['http://xmlns.com/foaf/0.1/Agent'] = "/iconos/agentec.png";
+    img['http://xmlns.com/foaf/0.1/Person'] = "/images/author-default.png";
+    img['http://purl.org/ontology/bibo/Document'] = "/images/documento.png";
+    img['http://purl.org/dc/terms/BibliographicResource'] =   "/images/documento.png";
+    img['http://purl.org/ontology/bibo/Map'] =   "/images/documento.png";
+    img['http://purl.org/ontology/bibo/Book'] =   "/images/documento.png";
+    img['http://umbel.org/umbel/rc/Resolution'] =   "/images/documento.png";
+    img['http://www.w3.org/ns/org#Site'] =   "/iconos/officeiconc.png";
+    img['http://www.cepal.org/vocabulary#Series_Cepal'] =   "/iconos/SeriesiconC.png";
+    img['http://purl.org/dc/dcmitype/Collection'] =   "/images/collection.png";
+    img['http://vocab.ox.ac.uk/projectfunding#Project'] =   "/iconos/ProjecticonC.png";
+    img['http://ns.nature.com/terms/Subject'] =   "/iconos/areaicon.png";
+    img['http://purl.org/linked-data/cube#DataSet'] = "/images/documento.png";
+    img['http://purl.org/linked-data/cube#Observation'] = "/images/documento.png";
+    img['http://purl.org/linked-data/cube#DataStructureDefinition'] = "/iconos/dsdiconc.png";
+    img['http://purl.org/linked-data/cube#DimensionProperty'] = "/iconos/dimiconc.png";
+    img['http://purl.org/linked-data/cube#ComponentSpecification'] = "/iconos/compiconc.png";
+    img['http://www.w3.org/2002/07/owl#Thing'] = "/iconos/resiconC.png";
+    img['http://purl.org/ontology/bibo/Collection'] = "/images/collection.png";
+
+    Session.set('img', img);
+
+
+     var restitle =  {};
+    restitle['http://dbpedia.org/resource/Guide_to_information_sources'] = "http://purl.org/dc/terms/title";
+    restitle['http://xmlns.com/foaf/0.1/Person'] = "http://xmlns.com/foaf/0.1/name";
+    restitle['http://xmlns.com/foaf/0.1/Organization'] = "http://xmlns.com/foaf/0.1/name";
+    restitle['http://xmlns.com/foaf/0.1/Agent'] = "http://xmlns.com/foaf/0.1/name";
+    restitle['http://xmlns.com/foaf/0.1/Organization'] =   "http://xmlns.com/foaf/0.1/name";
+    restitle['http://purl.org/ontology/bibo/Document'] = "http://purl.org/dc/terms/title";
+    restitle['http://purl.org/dc/terms/BibliographicResource'] =   "http://purl.org/dc/terms/title";
+    restitle['http://purl.org/ontology/bibo/Map'] =   "http://purl.org/dc/terms/title";
+    restitle['http://purl.org/ontology/bibo/Book'] =   "http://purl.org/dc/terms/title";
+    restitle['http://umbel.org/umbel/rc/Resolution'] =   "http://purl.org/dc/terms/title";
+    restitle['http://www.w3.org/ns/org#Site'] =   "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://www.cepal.org/vocabulary#Series_Cepal'] =   "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://purl.org/dc/dcmitype/Collection'] =   "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://vocab.ox.ac.uk/projectfunding#Project'] =   "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://ns.nature.com/terms/Subject'] =   "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://purl.org/linked-data/cube#DataSet'] = "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://purl.org/linked-data/cube#Observation'] = "http://www.w3.org/2000/01/rdf-schema#label";
+    //restitle['http://purl.org/linked-data/cube#DataStructureDefinition'] = "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://purl.org/linked-data/cube#DimensionProperty'] = "http://www.w3.org/2000/01/rdf-schema#label";
+    //restitle['http://purl.org/linked-data/cube#ComponentSpecification'] = "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://www.w3.org/2002/07/owl#Thing'] = "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://purl.org/ontology/bibo/Collection'] = "http://www.w3.org/2000/01/rdf-schema#label";
+    restitle['http://vivoweb.org/ontology/core#hasSubjectArea'] =  "http://www.w3.org/2000/01/rdf-schema#label";
+   
+    
+
+
+    
+    Session.set('restitle', restitle);
+
+
+    var exclusion = ["http://purl.org/linked-data/cube#dataSet"];
+    Session.set ('exclusion',exclusion);
+
+
+
+
+
+
+  //  Session.set(deslabel);
     //var vv2=v2;
     //var vv3=v3;
-
-
-  },
-
+//    /images/documento.png
+//    /images/collection.png
+//    /images/author-default.png
+  
+},
   //////////////////////////
   //Render Samples Views//
   //////////////////////////
@@ -123,6 +206,9 @@ var d3tip = require('d3-tip')(d3);
     
   }
 });
+     
+
+
    function initiaload (idbase , endpointbase ,  width , height ,  svg ) 
    {
            // var sparql = 'select * where { <'+idbase+'> ?b ?c . filter isLiteral (?c) }';
@@ -133,10 +219,27 @@ var d3tip = require('d3-tip')(d3);
             var objroot = {}; 
             var scope =  "scope" ;
 
+            var exc =  Session.get ('exclusion');
+             var exclusion = '';
+            if (exc.length > 0) {
+              var noexist = " . FILTER NOT EXISTS { ";
+              var exceptions = '';
+              for (var i= 0 ; i< exc.length ;i++){
+                 exception = '<'+idbase+'> <'+exc[i]+'>  ?c ';
+                   if ( i > 0 ){
+                   exceptions = exceptions + ' && '+exception;
+                   } else {
+                    exceptions = exception;
+                   }
+              }
+              exclusion = noexist+exceptions+' }';
+            }
+
+
 
            var sparql = 'Construct {'
                       + '<'+idbase+'> ?b ?c }'
-                      + 'where  { <'+idbase+'> ?b ?c} ' ;
+                      + 'where  { <'+idbase+'> ?b ?c '+exclusion+'} limit 1000' ;
 
          var context = {
                                 "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
@@ -161,20 +264,60 @@ var d3tip = require('d3-tip')(d3);
            if(result.resultSet) {
                   $('#modalLog .console-log').html('');
                     var resourcebase = {};
+                    console.log ("Resultado");
                     console.log (result.resultSet);
-                    var data = jQuery.parseJSON( result.resultSet.content);
 
-                    
+                   
 
+                       var data = jQuery.parseJSON( result.resultSet.content);
+                     console.log (data);
+                 
+
+                     jsonld.expand(data, function(err, expanded) {
+                          console.log ("Expand");                      
+                          console.log (expanded[0]);
+                          expanded = expanded[0];
+                         
+                        resourcebase["@id"] =  expanded["@id"] ;
+                        var typeA = expanded['@type'];
+                         var entityname = '';
+                         if (Array.isArray(typeA)) {
+                          entityname = typeA[0];
+                         } else {
+                           entityname = typeA;
+                         }
+ 
+                        // var  entityname= expanded['@type'] ;
+
+
+                      /* if (expanded['@type'] ==  'bibo:Collection' ) {
+                            
+                              entityname = 'collection';
+                           } else if ( compacted['@type'] == "foaf:Person") {
+                              entityname ='author';
+
+                           }else //if (  "bibo:Document" in compacted['@type'] )  //CHange
+                            {
+                               
+                              entityname = 'publication';
+                           }*/
+
+
+
+                     resourcebase [ entityname] = {'@id' : expanded["@id"] , 'data' : expanded , children : [] };7
+                     resourcebase [ 'tipo'] = entityname;
+                     draw(svg, width, height, resourcebase , scope , endpointbase); 
+
+                            });
                    //  var resultjson = jQuery.parseJSON( result.resultSet.content);
-
-                     console.log ("Compactcall");
-                     jsonld.compact(data , context, function(err, compacted) {
-                     console.log (err);
-                     console.log ("Compacted");
+                  
+                   /* console.log ("Compactcall");
+                    jsonld.compact(data , context, function(err, compacted) {
+                    console.log (err);
+                    console.log ("Compacted");
                      console.log(JSON.stringify(compacted, null, 2)); 
                      
-                   //  child [entityname] = {'@id' : objson["@id"] , 'data' : dataresult[i] , children : [] } ;
+                
                      resourcebase["@id"] =  compacted["@id"] ;
  
                          var  entityname= '';
@@ -196,7 +339,7 @@ var d3tip = require('d3-tip')(d3);
                      draw(svg, width, height, resourcebase , scope , endpointbase); 
                 //     datachildren (idbase , compacted , node , "publication");
                      // _.without(compacted, _.findWhere(compacted, {id: 3}));
-                      });
+                      }); */
 
 
                     } else {
@@ -246,8 +389,7 @@ var d3tip = require('d3-tip')(d3);
 
             } );
                   
-    };
-
+    }; 
 
  function draw(svg, width, height, data, scope , endpoint ) {
          var tip = d3.tip()
@@ -293,6 +435,7 @@ var d3tip = require('d3-tip')(d3);
             exploredArtistIds = [];
             initWithArtist(data);
             root = data ;
+           // root.typo = "Hola"; 
             root.x0 = viewerHeight / 2;
             root.y0 = 0;
             console.log ("Root");
@@ -447,23 +590,23 @@ var d3tip = require('d3-tip')(d3);
                 console.log (exploredArtistIds);
                 
               //  var dataini;
-              
+              /*
                 if (isAuthor(dataini)){
                 return  { "@id": id ,
                  'author': {"@id": id, data: dataini.author.data},
                   'children': null }
 
-                }else if (isPublication(dataini)) 
-                {
-                 return  { "@id": id ,
-                 'publication': {"@id": id, data: dataini.publication.data },
-                  'children': null }
                 } else if (isCollection(dataini)) {
                  return  { "@id": id ,
                  'collection': {"@id": id, data: dataini.collection.data },
                   'children': null }
+                } else // (isPublication(dataini)) 
+                {
+                 return  { "@id": id ,
+                 'publication': {"@id": id, data: dataini.publication.data },
+                  'children': null }
                 }
-               return dataini;
+               return dataini;*/
 
              /*{
                  'author': {"@id": id, data: dataini},
@@ -544,7 +687,10 @@ var d3tip = require('d3-tip')(d3);
                         .on("mouseover", function (d) {
                             var node = d;
                            var id;
-                            if ('publication' in d) {
+                           console.log ("Nodo Arbol");
+                           console.log (d);
+                                id =     d["@id"];
+                          /*  if ('publication' in d) {
                                  id = d.publication["@id"];
                               //  var title = _.findWhere(node.publication.jsonld["@graph"], {"@id": id, "@type": "bibo:Document"})["dcterms:title"];
                               //  tip.html(title);
@@ -560,7 +706,7 @@ var d3tip = require('d3-tip')(d3);
                                 var id = d.collection["@id"];
                               //  tip.html(id);
                                // tip.show(d);
-                            }
+                            }*/
                             // console.log ( d3.select(this));
                             // console.log (scale);
                             // console.log ($("svg.tree-overlay").children('g'));
@@ -619,7 +765,7 @@ var d3tip = require('d3-tip')(d3);
 
                 nodeEnter.append("image")
                         .attr("xlink:href", function (d) {
-                       if (isAuthor(d)) {
+                       /*if (isAuthor(d)) {
                                 return '/images/author-default.png';
                                 //return AE.getSuitableImage(d.author.images);
                            } else if (isCollection(d)) {
@@ -628,7 +774,11 @@ var d3tip = require('d3-tip')(d3);
                             }else {
 
                                 return '/images/documento.png' ;
-                            }
+                            }*/
+                          //  console.log ("-----IMAGEN");
+                           // console.log (resourceicon(d));
+                            return resourceicon(d);
+
                         })
                         .attr("x", "-32px")
                         .attr("y", "-32px")
@@ -655,7 +805,46 @@ var d3tip = require('d3-tip')(d3);
                             //return "middle";
                         })
                         .text(function (d) {
-                            if (isAuthor(d)) {
+                            var title =     resourcetitle(d);
+                            var t = '';
+
+                           // console.log ("TITULO");
+                            //console.log (title);
+                            if (Array.isArray(title)) {
+                                    t = title [0];
+                                  } else {
+                                    t = title;
+                                  }
+                     //      console.log ("3");
+                          
+                                   var restitle = {};
+                                if (t.length>1){
+                                   console.log ("sI"+t+t.length);
+                                  if (typeof d[d.tipo]['data'][t] === "undefined" ){
+                                   restitle['@value'] =  relativeURI(d.tipo);
+                                   }else {
+                                   restitle = d[d.tipo]['data'][t];
+                                  }
+                                  console.log (restitle);
+                                } else {
+                               //   console.log ("no"+t+t.length);
+                                   restitle['@value']= relativeURI(d.tipo);
+                                }
+                                // console.log ("2");
+
+                                   if (Array.isArray(restitle)) {
+                                       restitle = restitle[0];
+                                      } 
+                                       restitle = restitle['@value'];
+                                   console.log ("3");
+                              if (restitle.length > 40){
+                                 restitle  = restitle.substring (0,40)+ '...';
+
+                              }
+
+                              return restitle;
+
+                           /* if (isAuthor(d)) {
                                 //return d.author.name;
                                 var id = d.author["@id"];
                                 var name = d.author.data['foaf:name']; 
@@ -664,9 +853,7 @@ var d3tip = require('d3-tip')(d3);
                               ///   console.log ("AUTORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
                                // console.log (name);
                                //   console.log ("---");
-                                  if (Array.isArray(name)) {
-                                    name = name[0];
-                                  }
+                                  
 
                                 return name ;
 
@@ -690,7 +877,7 @@ var d3tip = require('d3-tip')(d3);
                              var id = d.collection["@id"];
                             // var publication = _.findWhere( d.publication.data["@graph"], {"@id": id, "@type": "bibo:Document"} );
                              return d.collection.data["dcterms:description"];
-                             }
+                             }*/
 
                         })
                         .style("fill-opacity", 0);
@@ -749,7 +936,9 @@ var d3tip = require('d3-tip')(d3);
                           tip.html( function (d) 
                           {
                             var enlace = "" ;
-                          if (isAuthor(d.target)) {
+
+                            enlace = d.target[d.target.tipo]["relation"];
+                        /*  if (isAuthor(d.target)) {
                           
                               enlace = d.target["author"]["relation"];
                           } else if (isPublication(d.target)) {
@@ -761,7 +950,8 @@ var d3tip = require('d3-tip')(d3);
                              enlace = d.target["collection"]["relation"];
                            }
                            return   equivalencias (enlace);
-
+                            */
+                            return   equivalencias (enlace);
                           }
                             );
                           tip.show(d);})
@@ -852,14 +1042,35 @@ var d3tip = require('d3-tip')(d3);
                       else if (text == "http://rdaregistry.info/Elements/a/P50161"){
                          return  "contributor of";
                       }else {
-                        if ( text.indexOf(":") > 0) {
+
+                        return relativeURI (text);
+                        /*if ( text.indexOf(":") > 0) {
+                          text = text.substr(text.indexOf(":") + 1);
+                        }
+                          var index =  text.lastIndexOf("/") ? text.lastIndexOf("/") : text.lastIndexOf("#"); 
+                          if (index > 0) {
+                            text = text.substr(index);
+
+                          }
+
+                        return text ;*/
+
+                      }
+
+                } 
+                 function relativeURI (text) {
+                     if ( text.indexOf(":") > 0) {
                           text = text.substr(text.indexOf(":") + 1);
                         }
 
-                        return text ;
-                      }
+                   var index =  text.lastIndexOf("/") ? text.lastIndexOf("/") : text.lastIndexOf("#"); 
+                          if (index > 0) {
+                            text = text.substr(index+1);
+                          }
 
-                }
+                        return text ;
+                      
+                 }
 
              function toggleChildrenRightClick(d) {
                 if (d.children) {
@@ -920,6 +1131,31 @@ var d3tip = require('d3-tip')(d3);
                 zoomListener.scale(scale);
                 zoomListener.translate([x, y]);
             }
+
+                 function resourceicon(d) {
+                   var imag = Session.get('img');
+                   //console.log (imag);
+                   return imag [d.tipo];
+                 // d.tipo;
+
+                 } 
+
+                   function resourcetitle(d) {
+                   var des = Session.get('restitle');
+                   console.log ("obtener des");
+                   console.log (d.tipo);
+                   console.log (des[d.tipo]);
+                 //  if (des[d.tipo] != undefined ){
+                   if ( typeof des[d.tipo] === "undefined" ){
+                   return "";
+                   }else {
+                     return des [d.tipo];
+                   
+                   }
+                 // d.tipo;
+
+                 } 
+
 
                function isAuthor(d) {
                 return 'author' in d;
@@ -1005,8 +1241,8 @@ var d3tip = require('d3-tip')(d3);
                     update(d, false);
                     centerNode(d);
                 } else {
-                   
-                    if (isAuthor(d)) {
+                     drawpanel (d , d.tipo);
+                    /*if (isAuthor(d)) {
                         drawpanel (d , "author");
                        // Datachild(d);
                     } else if (isPublication(d)) {
@@ -1016,7 +1252,7 @@ var d3tip = require('d3-tip')(d3);
                         drawpanel (d , "collection");
                       //  Datachild(d );
 
-                    }
+                    }*/
                      Datachild(d , endpointactual );
                     //console.log ("Node");
                     //console.log (d);
@@ -1032,8 +1268,8 @@ var d3tip = require('d3-tip')(d3);
                     console.log ("Consulta");
                     console.log (node);
                     var idbase = node["@id"];
-                      
-                     if (isCollection(node)) { waitingDialog.show(); }
+                       waitingDialog.show(); 
+                    // if (isCollection(node)) {}
 
                     var prefix =  ' PREFIX dct: <http://purl.org/dc/terms/> '
                                 + ' PREFIX bibo: <http://purl.org/ontology/bibo/> '
@@ -1042,7 +1278,7 @@ var d3tip = require('d3-tip')(d3);
                       
                    // jsonsparql = { sparql: 'select * where {<http://190.15.141.66:8899/uce/contribuyente/VELASCO__MARIA_DE_LOURDES> ?b ?c . filter (str(?b) != str(<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>))}' , validateQuery: false} ;
                     
-                    var sparql = ' Construct { '  
+                  /*  var sparql = ' Construct { '  
                   + '<'+idbase+'> ?b ?c .'
                   + '?c <http://purl.org/dc/terms/title> ?t .'
                   + '?c <http://purl.org/dc/terms/subject> ?s .'
@@ -1077,7 +1313,39 @@ var d3tip = require('d3-tip')(d3);
                   +   'OPTIONAL { ?c <http://purl.org/ontology/bibo/uri> ?ur } ' 
                   +  'OPTIONAL {?c   <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>   ?tipe}}' 
                   +  'Order by (?b)' ;
-               //   + 'filter (str(?b) != str(<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>))'
+               //   + 'filter (str(?b) != str(<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>))'*/
+ //FILTER ( ?b != <http://purl.org/linked-data/cube#dataSet> &&   ?n != <http://purl.org/linked-data/cube#dataSet> && isLiteral (?x) ) 
+
+                var exc =  Session.get ('exclusion');
+             var exclusion = '';
+            if (exc.length > 0) {
+            //  var noexist = " . FILTER NOT EXISTS { ";
+              var exceptions = '';
+              for (var i= 0 ; i< exc.length ;i++){
+                 exception = ' ?b != <'+exc[i]+'>  &&  ?n != <'+exc[i]+'>  &&  ?a != <'+exc[i]+'>  ';
+                   if ( i > 0 ){
+                   exceptions = exceptions + ' && '+exception;
+                   } else {
+                    exceptions = exception;
+                   }
+              }
+               exclusion = exceptions+' ';
+              //exclusion = exceptions+' && ';
+            }
+
+/*
+                    var sparql =  'Construct {  <'+idbase+'> ?b ?c . <'+idbase+'> a ?z . <'+idbase+'> ?n ?m '+
+                    '. ?c ?a ?x . ?c a ?y } where { <'+idbase+'> ?b ?c  . <'+idbase+'> a ?z .   <'+idbase+'> ?n ?m .' +
+                   '?c ?a ?x .  ?c a ?y . FILTER  ( '+exclusion+' &&  isLiteral (?m) && isIRI (?c) )} limit 1000';
+*/
+
+                    var sparql =  'Construct {  <'+idbase+'> ?b ?c . <'+idbase+'> a ?z . <'+idbase+'> ?n ?m '+
+                    '. ?c ?a ?x . ?c a ?y } where { <'+idbase+'> ?b ?c  . <'+idbase+'> a ?z .   <'+idbase+'> ?n ?m .' +
+                   '?c ?a ?x .  ?c a ?y . FILTER  ( '+exclusion+' )} ';
+
+                   /*   var sparql =  'Construct {  <'+idbase+'> ?b ?c . <'+idbase+'> a ?z . <'+idbase+'> ?n ?m '+
+                    '. ?c ?a ?x . ?c a ?y } where { <'+idbase+'> ?b ?c  . <'+idbase+'> a ?z .   <'+idbase+'> ?n ?m .' +
+                   '?c ?a ?x .  ?c a ?y . FILTER  ( '+exclusion+'  isLiteral(?x) )} limit 1000';*/
 
 
                    var  jsonsparql = { "sparql": sparql , 'validateQuery': false} ;
@@ -1121,10 +1389,63 @@ var d3tip = require('d3-tip')(d3);
                             };
                     
                    var resultjson = jQuery.parseJSON( result.resultSet.content);
-
-                    // console.log ("Compactcall");
+                     console.log ("RESULTADO");
+                     console.log (resultjson);
                     waitingDialog.hide();
+
                      if (resultjson.hasOwnProperty("@graph")) {
+                      jsonld.expand(resultjson, function(err, expanded) {
+                          console.log ("Expand");                      
+                          console.log (expanded);
+                        //  expanded = expanded[0]; 
+                            var dataresult =  expanded;
+
+
+                        var num = 0;
+                     
+                      for (var j = 0 ; j <dataresult.length; j++){ 
+                            if (dataresult[j]["@id"] == idbase && j > 0){
+                                 var  aux = dataresult[0];
+                                 dataresult[0] = dataresult[j];
+                                 dataresult[j] = aux;
+                            }else if (dataresult[j]["@type"] != "owl:Thing"){
+                                 num ++;
+                            }
+                      }
+      
+
+                              
+                           Session.set('numresultgraph', num);
+
+
+                          if (num > 20){
+                         
+                           // confirm ("Muchos registros");
+                       //     $( "#dialog-confirm" ).dialog( "open" );
+                              $( "#Despl-todos").click (function () 
+                              {
+                                datachildren (idbase , dataresult , node , "publication" , false);
+                                $( "#myModal").modal('hide');
+                              });
+                            
+                                $( "#Despl-Muestra").click (function () 
+                              {  //alert ();
+                                datachildren (idbase , dataresult , node , "publication" , true);
+                                $( "#myModal").modal('hide');
+                              });
+
+                            $( "#myModal").modal();
+
+                          
+
+                        
+
+                          } else {
+                            datachildren (idbase , dataresult , node , "publication" , false);
+                          }
+
+                        });
+/*
                      jsonld.compact(resultjson , context, function(err, compacted) {
                      console.log ("Compacted");
                      console.log(JSON.stringify(compacted, null, 2)); 
@@ -1167,7 +1488,7 @@ var d3tip = require('d3-tip')(d3);
                                  }
                                });*/
                               
-                           Session.set('numresultgraph', num);
+   /*                        Session.set('numresultgraph', num);
 
 
                           if (num > 20){
@@ -1200,14 +1521,14 @@ var d3tip = require('d3-tip')(d3);
 
                    //  datachildren (idbase , compacted , node , "publication");
                       });
-
+                          */
 
                      } else {
                             
                            Meteor.call('findendpointactual', idbase  , function(error, result) { 
                                console.log ("Entra findend");
                                console.log (result);
-                             if (result.statusCode == 200 && result.content )
+                             if (result.statusCode == 200 && result.content && endpointselect['endpoint']!=  result.endpoint["endpoint"])
                              {    console.log ("Ahora si");
                                  
                                    endpointactual['endpoint'] = result.endpoint["endpoint"];
@@ -1290,13 +1611,35 @@ var d3tip = require('d3-tip')(d3);
                          if (objson["@id"] == idbase   ) 
                           {
                               console.log ("Entra datos");
-                              console.log (node);
+                              console.log (objson);
 
                           relations = hrelations (objson);
                           console.log ("Propiedades");
                           console.log (relations);
 
 
+                                            var tipo = objson['@type'];
+                                             
+                                            if (Array.isArray(tipo)){
+
+                                              if ( node['tipo']!= undefined){
+
+                                              for (var i = 0 ; i < tipo.length ;i++) {
+                                                
+                                                if (tipo[i] == node['tipo']){
+                                                tipo = tipo[i];
+                                                break;
+                                                }
+                                              }
+                                              }
+                                            }
+
+                                            console.log (tipo);
+                              console.log ("NODO TIPO");  
+                              console.log (node);
+                                    node[tipo]['data']= objson;
+                                    node['tipo']=tipo; 
+/*
                               if ( objson["@type"] == "foaf:Person" ){
                                  node['author']['data'] =  objson;
                              //    node ['author']['data']['Relation'] = "SameAs";
@@ -1311,9 +1654,8 @@ var d3tip = require('d3-tip')(d3);
                                  node['publication']['data'] =  objson;
                                //  node['publication']['data']['Relation'] =  "SameAs";
                               }
-
-                                
-                              console.log (node);
+*/
+                             
                            if (objson.hasOwnProperty ("owl:sameAs"))
                            {  
                              console.log("Si sameAs");
@@ -1396,8 +1738,11 @@ var d3tip = require('d3-tip')(d3);
 
 
                            _.map(typedata, function (value, idx) {
-                            
-                           
+                            if (idx == 0){
+                            console.log("VALOR");
+                            console.log(value);
+                            entityname = value;
+                           /*
                            if (value ==  'bibo:Collection' ) {
                             
                               entityname = 'collection';
@@ -1409,17 +1754,19 @@ var d3tip = require('d3-tip')(d3);
                               entityname = 'publication';
                            }else {
                            	  entityname  =   'false';
-                           }
+                           }*/
 
 
                             if (entityname != 'false'){
 
                            child [entityname] = {'@id' : objson["@id"] , 'data' : dataresult[i] , children : [] ,  'relation': relations[objson["@id"]] };
+                           child ['tipo'] = entityname;
                            node.children.push(child);
                         //   exploredArtistIds.push(objson[j]["@id"]);
                         console.log (relations[objson["@id"]]);
                           console.log ("Nuevo Child");
                           console.log (child);
+                          }
                           // console.log ("Explorados");
                           // console.log (exploredArtistIds);
                              }
@@ -1516,32 +1863,72 @@ var d3tip = require('d3-tip')(d3);
                    // var entity = _.findWhere(node.publication.data["@graph"], {"@id": id, "@type": "bibo:Document"});
                    var entity ;
                    var model = {}; 
-                    if (entityname == 'publication') {
-                      id = node.publication["@id"];
-                      entity = node.publication.data ;
-                        model = {"dcterms:title": {label: "Title", containerType: "div"},
-                        "bibo:abstract": {label: "Abstract", containerType: "div"},
-                        "dcterms:language": {label: "Language", containerType: "div"},
-                        "dcterms:subject": {label: "Subject", containerType: "div"},
+
+                    id = node["@id"];
+                      console.log  ("NODO");
+                      console.log  (node);
+                      var tipe = node.tipo; 
+                      console.log  (tipe);
+                      entity = node[tipe]['data'] ;
+
+                    model = {"http://purl.org/dc/terms/title": {label: "Title", containerType: "div"},
+                       "http://www.w3.org/2000/01/rdf-schema#label":  {label: "Descripción", containerType: "div"} ,
+                        "http://purl.org/dc/terms/description": {label: "Description", containerType: "div"},
+                        "http://www.w3.org/2004/02/skos/core#definition": {label: "Definition", containerType: "div"} ,
+                        "http://www.eea.europa.eu/portal_types/Specification#methodology": {label: "Methodology", containerType: "div"} ,
+                        "http://purl.org/dc/terms/language": {label: "Language", containerType: "div"},
+                        "http://vivoweb.org/ontology/core#freetextKeyword": {label: "Temas", containerType: "div"},
+                        "http://purl.org/dc/terms/subject": {label: "Subject", containerType: "div"},
+                        "http://purl.org/dc/terms/date": {label: "Date", containerType: "div"},
+                        "http://purl.org/dc/terms/modified": {label: "Update", containerType: "div"},
+                        "http://www.w3.org/2004/02/skos/core#note": {label: "Note", containerType: "div"},
                         "@type": {label: "Type", containerType: "div"},
-                        "bibo:uri": {label: "URL", containerType: "div"},
+                        "http://purl.org/dc/terms/format": {label: "Format", containerType: "div"},
+                        "http://www.w3.org/ns/dcat#downloadURL": {label: "URL Document", containerType: "a"},
+                        "http://purl.org/dc/terms/dateSubmitted": {label: "Date", containerType: "div"} ,
+                        "http://xmlns.com/foaf/0.1/name": {label: "Name", containerType: "div"} ,
+                        "http://purl.org/ontology/bibo/handle": {label: "Fuente", containerType: "a"} ,
+                        "http://www.cepal.org/vocab#subject_CEPAL":  {label: "Tema CEPAL", containerType: "div"} ,
+                        "http://www.cepal.org/vocab#subject_ONU":  {label: "Tema CEPAL", containerType: "div"} ,
+                        "http://www.w3.org/ns/org#siteOf":  {label: "Office", containerType: "div"} ,
+                        "http://purl.org/linked-data/sdmx/2009/attribute#unitMeasure": {label: "Unit unitMeasure", containerType: "div"} 
+                        
+                         };
+                    
+               /*
+                  
+                    if (entityname == 'http://dbpedia.org/resource/Guide_to_information_sources') {
+                      id = node["@id"];
+                      console.log  ("NODO");
+                      console.log  (node);
+                      var tipe = node.tipo; 
+                      console.log  (tipe);
+                      entity = node[tipe]['data'] ;
+                        model = {"http://purl.org/dc/terms/title": {label: "Title", containerType: "div"},
+                        "http://purl.org/dc/terms/description": {label: "Description", containerType: "div"},
+                        "http://purl.org/dc/terms/language": {label: "Language", containerType: "div"},
+                        "http://vivoweb.org/ontology/core#freetextKeyword": {label: "Temas", containerType: "div"},
+                        "http://purl.org/dc/terms/subject": {label: "Subject", containerType: "div"},
+                        "http://purl.org/dc/terms/date": {label: "Date", containerType: "div"},
+                        "@type": {label: "Type", containerType: "div"},
                         "bibo:handle": {label: "More Info", containerType: "a"},
                         "dcterms:publisher": {label: "Publisher", containerType: "div"},
                         "bibo:numPages": {label: "Pages", containerType: "div"}
                          };
-                  //      "bibo:Quote": {label: "Keywords", containerType: "div"}
+                  //"bibo:Quote": {label: "Keywords", containerType: "div"}
                          
-                     } else if (entityname == 'author') {
-                        id = node.author["@id"];
-                        entity = node.author.data ;
-                        console.log ("draw");
-                        console.log (entity);
+                     } else if (entityname == 'http://xmlns.com/foaf/0.1/Agent' ||  entityname == 'http://xmlns.com/foaf/0.1/Person' ) {
+                        id = node["@id"];
+                        var tipe = node.tipo;
+                         entity = node[tipe]['data'];
+                      //  console.log ("draw");
+                      //  console.log (entity);
                       /*  model = {"http://xmlns.com/foaf/0.1/name": {label: "Name", containerType: "div"},
                         "http://xmlns.com/foaf/0.1/firstName": {label: "First Name", containerType: "div"},
                         "http://xmlns.com/foaf/0.1/lastName": {label: "Last Name", containerType: "div"},
-                         };*/
+                         };
                           model = { "Relation" : {label : "Relation" , containerType: "div"} ,
-                        "foaf:name": {label: "Name", containerType: "div"},
+                        "http://xmlns.com/foaf/0.1/name": {label: "Name", containerType: "div"},
                         "foaf:firstName": {label: "First Name", containerType: "div"},
                         "foaf:lastName": {label: "Last Name", containerType: "div"},
                          };
@@ -1556,7 +1943,7 @@ var d3tip = require('d3-tip')(d3);
                       //  "http://xmlns.com/foaf/0.1/firstName": {label: "First Name", containerType: "div"},
                       //  "http://xmlns.com/foaf/0.1/lastName": {label: "Last Name", containerType: "div"},
                          };
-                     }
+                     } */
                  //   infoBar.find('h4').text("Publication Info");
                //  console.log ('Info Barra');
                //  console.log (entity['http://purl.org/dc/terms/title']);
@@ -1567,10 +1954,20 @@ var d3tip = require('d3-tip')(d3);
                     var pubInfo = $('div.tree-node-info .entityInfo');
                     pubInfo.html('');
                     _.each(_.keys(model), function (key, idx) {
+                    //  console.log ("EntityKEY");
+                    //  console.log (entity[key] );
+                      // console.log (entity[key][0] );
+                        // if (Array.isArray(entity[key])){
+                        // entity[key] = entity[key][0];
+                        // }
+                              //console.log (entity[key][0]["@value"]);
                               
                         if (entity[key]) {
-                            if (model[key].containerType == 'a') {
-                                var values =  entity[key]; //entity[key].length ?
+                           /* if (model[key].containerType == 'a') {
+                              
+                              
+                             
+                                var values =  entity[key]["@value"]; //entity[key].length ?
                                        // _.pluck(entity[key], '@id') : [entity[key]["@id"]];
                                 var div = $('<div>');
                                 var label = $('<span class="label label-primary">').text(lang.lang(model[key].label));
@@ -1582,26 +1979,52 @@ var d3tip = require('d3-tip')(d3);
                                     div.append(anchor);
                                     div.append("</br>");
                                     pubInfo.append(div);
-                               //     return anchor;
+                               //     return anchor;*/
                              //   });
-                            } else { //append into a div container
+                           // } else { //append into a div container
                                 var div = $('<div>');
                                 var label = $('<span class="label label-primary">').text(lang.lang(model[key].label));
                                 div.append(label);
                                 div.append("</br>");
                                 pubInfo.append(div);
                                 var values = entity[key].length ? entity[key] : [entity[key]];
+                                console.log ("VALOR");
+                                console.log (values);
                                 if (typeof (values) === 'string') {
-                                    var span = $('<span class="field-value">').text(values);
+                                    var span = $("<a target='blank'>").attr('href', values).text(values);
                                     div.append(span);
                                 } else {
                                     _.map(values, function (value, idx) {
-                                        var span = $('<span class="field-value">').text(value);
+                                       console.log (value);
+                                       if (model[key].containerType == 'a') {
+                                        if (typeof (value) === 'string') {
+                                                var span =  $("<a target='blank'>").attr('href', value).text(value);
+                                                div.append(span);
+                                                 div.append("</br>");
+                                       } else {
+                                        var span = $("<a target='blank'>").attr('href', value['@value']).text(value['@value']);
                                         div.append(span);
-                                        div.append("</br>");
+                                        div.append("</br>");}
+
+                                       }
+                                        else {
+                                      if (typeof (value) === 'string') {
+                                                var span = $('<span class="field-value">').text(value);
+                                                div.append(span);
+                                                div.append("</br>");
+                                       } else {
+                                        var lan = "";
+                                        if (!(typeof value['@language'] === 'undefined'))
+                                        {  lan = " ("+value['@language']+")" ;
+
+                                        }
+                                        var span = $('<span class="field-value">').text(value['@value']+lan);
+                                        div.append(span);
+                                        div.append("</br>");}
+                                        }
                                     });
                                 }
-                            }
+                            //}
                              
                         }
 

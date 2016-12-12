@@ -213,6 +213,8 @@ this.SearchView = Backbone.View.extend({
         var term = Session.get('s1');
         var type = Session.get('s2');
         var base = Session.get('s3')
+        console.log (type);
+        updatebuttons2 (type);
         /*
          * 
          * 
@@ -392,7 +394,8 @@ this.SearchView = Backbone.View.extend({
             //var EntitySearch = get_radio_value("resourceType");
 
 
-            var EntitySearch = get_radio_value("opciones");
+            //var EntitySearch = get_radio_value("opciones");
+            var EntitySearch = $('label[select="1"]').attr('tipo');
 
             var FromListaux = get_checkList_values("repositoriesList");
             if (FromListaux.length > 0) {
