@@ -1,55 +1,173 @@
 {
-        "Repositories":[
-            {"Name":"cepalstat", "Classes":["Indicator"]},
-            {"Name":"biblioguias", "Classes":["Agent","Libguide"]},
-            {"Name":"repositorio", "Classes":["Agent","Site","Collection","Project","BibliographicResource","Workarea"]}
-        ],
-	"MainClasses":[
-		{"Name":"Libguide", 
-		 "URI": "http://dbpedia.org/resource/Guide_to_information_sources", 
-		 "AutocompleteProperties":[
-						"http://purl.org/dc/terms/title",
-						"http://purl.org/dc/terms/subject"
-		]},
-		{"Name":"Agent", 
-		 "URI": "http://xmlns.com/foaf/0.1/Agent", 
-		 "AutocompleteProperties":[
-						"http://xmlns.com/foaf/0.1/name"
-		]},
-		{"Name":"Site", 
-		 "URI": "http://www.w3.org/ns/org#Site", 
-		 "AutocompleteProperties":[
-						"http://www.w3.org/2000/01/rdf-schema#label"
-		]},
-		{"Name":"Collection", 
-		 "URI": "http://purl.org/dc/dcmitype/Collection", 
-		 "AutocompleteProperties":[
-						"http://www.w3.org/2000/01/rdf-schema#label"
-		]},
-		{"Name":"Project", 
-		 "URI": "http://vocab.ox.ac.uk/projectfunding#Project", 
-		 "AutocompleteProperties":[
-						"http://www.w3.org/2000/01/rdf-schema#label"
-		]},
-		{"Name":"BibliographicResource", 
-		 "URI": "http://purl.org/dc/terms/BibliographicResource", 
-		 "AutocompleteProperties":[
-						"http://purl.org/dc/terms/title",
-						"http://purl.org/dc/terms/subject"
-		]},
-		{"Name":"Workarea", 
-		 "URI": "http://ns.nature.com/terms/Subject", 
-		 "AutocompleteProperties":[
-						"http://www.w3.org/2000/01/rdf-schema#label"
-		]},
-		{"Name":"Indicator", 
-		 "URI": "http://purl.org/linked-data/cube#DataSet", 
-		 "AutocompleteProperties":[
-						"http://vivoweb.org/ontology/core#freetextKeyword",
-						"http://www.w3.org/2000/01/rdf-schema#label"
-		]}
+    
+    "ResultSearchPropertiesGorup":["subject","freetextKeyword"],
+    
+    
+    
+    "Repositories": [
+        {
+            "Name": "cepalstat",
+            "Classes": ["Indicator"],
+            "ClassesSearch": ["Indicator"],
+            "StatsResources":["Indicator"]
+        },
+        {
+            "Name": "biblioguias",
+            "Classes": ["Agent", "Libguide"],
+            "ClassesSearch": ["Agent", "Libguide"],
+            "StatsResources":["Agent", "Libguide"]
+        },
+        {
+            "Name": "repositorio",
+            "Classes": ["Agent", "Site", "Collection", "Project", "BibliographicResource", "Workarea"],
+            "ClassesSearch": ["Agent", "Site", "Collection", "Project", "BibliographicResource", "Workarea"],
+            "StatsResources":["Agent", "Collection","BibliographicResource"]
+        }
+    ],
+    "MainClasses": [
+        {
+            "Name": "Libguide",
+            "URI": "http://dbpedia.org/resource/Guide_to_information_sources",
+            "AutocompleteProperties": [
+                "http://purl.org/dc/terms/title",
+                "http://purl.org/dc/terms/subject"
+            ],
+            "labelProperty": "http://purl.org/dc/terms/title",
+            "indexProperties": [
+                "http://purl.org/dc/terms/title",
+                "http://purl.org/dc/terms/subject",
+                "http://purl.org/dc/terms/description"
+            ],
+            "ApplyFilter":false,
+            "LangQuery":"optional { ?EntityURI <http://purl.org/dc/terms/language> ?Lang1 .   }",
+            "YearQuery":"optional { ?EntityURI <http://purl.org/dc/terms/date> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }",
+            "TypeQuery":"optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'none' &&  str(?Type1) != 'none') .   }",
+            "Icon":"glyphicon glyphicon-file"
+        },
+        {
+            "Name": "Agent",
+            "URI": "http://xmlns.com/foaf/0.1/Agent",
+            "AutocompleteProperties": [
+                "http://xmlns.com/foaf/0.1/name"
+            ],
+            "labelProperty": "http://xmlns.com/foaf/0.1/name",
+            "indexProperties": [
+                "http://xmlns.com/foaf/0.1/name"
+            ],
+            "ApplyFilter":true,
+            "LangQuery":"optional { ?EntityURI <none> ?Lang1 .   }",
+            "YearQuery":"optional { ?EntityURI <none> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }",
+            "TypeQuery":"optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'none' &&  str(?Type1) != 'none') .   }",
+            "Icon":"glyphicon glyphicon-user"
+        },
+        {
+            "Name": "Site",
+            "URI": "http://www.w3.org/ns/org#Site",
+            "AutocompleteProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "labelProperty": "http://www.w3.org/2000/01/rdf-schema#label",
+            "indexProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "ApplyFilter":true,
+            "LangQuery":"optional { ?EntityURI <none> ?Lang1 .   }",
+            "YearQuery":"optional { ?EntityURI <none> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }",
+            "TypeQuery":"optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'none' &&  str(?Type1) != 'none') .   }",
+            "Icon":"glyphicon glyphicon-folder-open"
+        },
+        {
+            "Name": "Collection",
+            "URI": "http://purl.org/dc/dcmitype/Collection",
+            "AutocompleteProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "labelProperty": "http://www.w3.org/2000/01/rdf-schema#label",
+            "indexProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "ApplyFilter":true,
+            "LangQuery":"optional { ?EntityURI <none> ?Lang1 .   }",
+            "YearQuery":"optional { ?EntityURI <none> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }",
+            "TypeQuery":"optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'none' &&  str(?Type1) != 'none') .   }",
+            "Icon":"glyphicon glyphicon-folder-open"
+        },
+        {
+            "Name": "Project",
+            "URI": "http://vocab.ox.ac.uk/projectfunding#Project",
+            "AutocompleteProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "labelProperty": "http://www.w3.org/2000/01/rdf-schema#label",
+            "indexProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "ApplyFilter":true,
+            "LangQuery":"optional { ?EntityURI <none> ?Lang1 .   }",
+            "YearQuery":"optional { ?EntityURI <none> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }",
+            "TypeQuery":"optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'none' &&  str(?Type1) != 'none') .   }",
+            "Icon":"glyphicon glyphicon-folder-open"
+        },
+        {
+            "Name": "BibliographicResource",
+            "URI": "http://purl.org/dc/terms/BibliographicResource",
+            "AutocompleteProperties": [
+                "http://purl.org/dc/terms/title",
+                "http://purl.org/dc/terms/subject"
+            ],
+            "labelProperty": "http://purl.org/dc/terms/title",
+            "indexProperties": [
+                "http://purl.org/dc/terms/title",
+                "http://purl.org/dc/terms/subject",
+                "http://purl.org/dc/terms/description"
+            ],
+            "ApplyFilter":false,
+            "LangQuery":"optional { ?EntityURI <http://purl.org/dc/terms/language> ?Lang1 .   }",
+            "YearQuery":"optional { ?EntityURI <http://purl.org/dc/terms/issued> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }",
+            "TypeQuery":"optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'http://purl.org/dc/terms/BibliographicResource' &&  str(?Type1) != 'none') .   }",
+            "Icon":"glyphicon glyphicon-file"
+        },
+        {
+            "Name": "Workarea",
+            "URI": "http://ns.nature.com/terms/Subject",
+            "AutocompleteProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "labelProperty": "http://www.w3.org/2000/01/rdf-schema#label",
+            "indexProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "ApplyFilter":true,
+            "LangQuery":"optional { ?EntityURI <none> ?Lang1 .   }",
+            "YearQuery":"optional { ?EntityURI <none> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }",
+            "TypeQuery":"optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'none' &&  str(?Type1) != 'none') .   }",
+            "Icon":"glyphicon glyphicon-folder-open"
+        },
+        {
+            "Name": "Indicator",
+            "URI": "http://purl.org/linked-data/cube#DataSet",
+            "AutocompleteProperties": [
+                "http://vivoweb.org/ontology/core#freetextKeyword",
+                "http://www.w3.org/2000/01/rdf-schema#label"
+            ],
+            "labelProperty": "http://www.w3.org/2000/01/rdf-schema#label",
+            "indexProperties": [
+                "http://www.w3.org/2000/01/rdf-schema#label",
+                "http://vivoweb.org/ontology/core#freetextKeyword",
+                "http://www.w3.org/2000/01/rdf-schema#comment",
+                "http://www.w3.org/2004/02/skos/core#definition",
+                "http://www.eea.europa.eu/portal_types/Specification#methodology",
+                "http://www.w3.org/2004/02/skos/core#note",
+                "http://purl.org/linked-data/sdmx/2009/attribute#unitMeasure"
+            ],
+            "ApplyFilter":false,
+            "LangQuery":"optional { ?EntityURI <none> ?Lang1 .   }",
+            "YearQuery":"optional { ?EntityURI <http://purl.org/dc/terms/modified> ?y2. bind( strafter( ?y2, '/' ) as ?y4 ). bind( strafter( ?y4, '/' ) as ?y5 ). bind( strbefore( ?y5, ' ' ) as ?y6 ). bind( if (str(?y6)='' ,?y5, ?y6) as ?Year1 ). }",
+            "TypeQuery":"optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'none' &&  str(?Type1) != 'none') .   }",
+            "Icon":"glyphicon glyphicon-file"
+        }
 
-	]
+    ]
 
 
 }

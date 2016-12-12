@@ -1,5 +1,10 @@
 if (Meteor.isClient) {
 
+        Session.set('ConfigInfo', null);
+        Meteor.call('ConfigInfo', function ( error, result){
+            Session.set('ConfigInfo', result);
+        });
+
     Session.set('AuxCargS', 0);
 
     var _logout = Meteor.logout;
@@ -148,23 +153,35 @@ if (Meteor.isClient) {
 
                 data = data[0];
                 data = data.val;
-                var C = 0;
-                var D = 0;
-                var P = 0;
-                for (var i = 0; i < data.length; i++) {
-                    C += Number(data[i].C.value);
-                    D += Number(data[i].D.value);
-                    P += Number(data[i].P.value);
+                
+                var lsClases2= data.map (function (a){
+                    return a.CL;
+                });
+                
+                var unique = function(xs) {  return xs.filter(function(x, i) {return xs.indexOf(x) === i;});};
+                var lsClases=unique(lsClases2);
+                
+                var lsD=[];
+                for (var jk=0; jk<lsClases.length; jk++ ){
+                    
+                    var lsDD = data.filter(function (a){
+                        return a.CL==lsClases[jk];
+                    });
+                    var bb=0;
+                    for (var jke=0; jke<lsDD.length; jke++ ){
+                        bb+=Number(lsDD[jke].CO);   
+                    }
+                    lsD.push({value: bb, label: lang.lang(lsClases[jk]+'')});
+                    
                 }
-                str = [{value: C, label: lang.lang("Collections")}, {value: D, label: lang.lang("Documents")}, {value: P, label: lang.lang("Persons")}];
+                
+                
+                str = lsD;
             } else {
                 str = [{value: 100, label: "Something"}];
             }
             $('#ResourcesChart').empty();
             try {
-                // if ($('#ResourcesChart').length == 0) {
-                //     return str;
-                //  }
 
                 //ResourcesChart
                 var pie = new d3pie("ResourcesChart", {
@@ -270,18 +287,29 @@ if (Meteor.isClient) {
             if (Statsc && data && data[0] && data[0].val) {
                 data = data[0];
                 data = data.val;
-                var C = 0;
-                var D = 0;
-                var P = 0;
-                str = [];
-                for (var i = 0; i < data.length; i++) {
-                    C = Number(data[i].C.value);
-                    D = Number(data[i].D.value);
-                    P = Number(data[i].P.value);
-                    var T = C + D + P;
-                    str.push({value: T, label: "" + data[i].EP.value});
+                      var lsClases2= data.map (function (a){
+                    return a.EP;
+                });
+                
+                var unique = function(xs) {  return xs.filter(function(x, i) {return xs.indexOf(x) === i;});};
+                var lsClases=unique(lsClases2);
+                
+                var lsD=[];
+                for (var jk=0; jk<lsClases.length; jk++ ){
+                    
+                    var lsDD = data.filter(function (a){
+                        return a.EP==lsClases[jk];
+                    });
+                    var bb=0;
+                    for (var jke=0; jke<lsDD.length; jke++ ){
+                        bb+=Number(lsDD[jke].CO);   
+                    }
+                    lsD.push({value: bb, label: lang.lang(lsClases[jk]+'')});
+                    
                 }
-                //str = [{y:C,indexLabel:"Collections"},{y:D,indexLabel:"Documents"},{y:P,indexLabel:"Persons"}];
+                
+                
+                str = lsD;
             } else {
                 str = [{value: 100, label: "Something"}];
             }
@@ -473,7 +501,7 @@ if (Meteor.isClient) {
                     switch (strUser) {
                         case 'type':
                             v = 't';
-                            g = 'Document';
+                            g = 'BibliographicResource';
                             break;
                         case 'language':
                             v = 'l';
@@ -752,7 +780,7 @@ if (Meteor.isClient) {
                 }
             } catch (az)
             {
-                //console.log(az);
+                console.log(az);
             }
             return str;
         },
@@ -796,11 +824,20 @@ if (Meteor.isClient) {
                         clas = clas.substr(clas.lastIndexOf('#') + 1);
 
                         switch (clas) {
-                            case 'P50195':
+                            case 'P60672':
                                 clas = 'Authors';
                                 break;
-                            case 'P50161':
+                            case 'P60621':
                                 clas = 'Editors';
+                                break;
+                            case 'P50161':
+                                clas = 'Contributors';
+                                break;
+                            case 'P50203':
+                                clas = 'Publishers';
+                                break;
+                            case 'Person':
+                                continue;
                                 break;
                         }
 
@@ -810,20 +847,20 @@ if (Meteor.isClient) {
                         } else {
                             lsc[clas + ''] = cou;
                         }
-                        res += cou;
+                        //res += cou;
                     }
                 }
-                var inter = res - resTot;
+                //var inter = res - resTot;
                 str = [];
-                var inters = '';
+               // var inters = '';
                 for (var propertyName in lsc) {
-                    str.push({value: lsc[propertyName + ''] - inter, label: propertyName + ""});
-                    inters = inters + propertyName + ' & ';
+                    str.push({value: lsc[propertyName + ''] , label: propertyName + ""});
+                    //inters = inters + propertyName + ' & ';
                 }
-                inters = inters.substring(0, inters.length - 3);
-                if (inter > 0) {
-                    str.push({value: inter, label: inters + ""});
-                }
+                //inters = inters.substring(0, inters.length - 3);
+               // if (inter > 0) {
+                 //   str.push({value: inter, label: inters + ""});
+               // }
                 //TopA
                 frequency_list = [];
                 var max = 0;
@@ -1938,7 +1975,8 @@ if (Meteor.isClient) {
             } else {
                 return  lang.lang('No-results');
             }
-        }, DespSug: function () {
+        }, 
+        DespSug: function () {
             var des = Session.get("DespSug");
             if (des) {
 
@@ -1947,7 +1985,8 @@ if (Meteor.isClient) {
                 return "glyphicon glyphicon-chevron-down";
             }
 
-        }, DespFac: function () {
+        }, 
+        DespFac: function () {
             var des = Session.get("DespFac");
             if (des) {
 
@@ -2104,13 +2143,17 @@ if (Meteor.isClient) {
         return querylist;
     }
     function dataSourceSearch(response) {
+        
+        
+        
+        
         var toShow = [];
         if (response) {
-            //var NumMode = Session.get('Qmode');
-
-
-            console.log(response.content);
-
+        var ConfigInfo = Session.get('ConfigInfo');
+        var lsIcon={};
+        for (var k=0; k<ConfigInfo.MainClasses.length; k++ ){
+            lsIcon[''+ConfigInfo.MainClasses[k].URI]=ConfigInfo.MainClasses[k].Icon;
+        }
             var NumMode = Qmode;
             //alert(NumMode + "");
             if (NumMode == 2) {
@@ -2125,8 +2168,6 @@ if (Meteor.isClient) {
             var titledoc = "";
             //graphURI
             for (var k = 0; k < resp.length; k++) {
-                console.log("Respuesta" + k);
-                console.log(resp[k]);
                 var OneResult = {};
                 if (NumMode == 1) {
                     OneResult = toShow.filter(function (val) {
@@ -2184,32 +2225,13 @@ if (Meteor.isClient) {
                         OneResult.MatchsProperty = [{p: SearchVar_, v: resp[k][SearchVar].value, l: resp[k][SearchVar].value.length > MaxLength, s: resp[k][SearchVar].value.substr(0, MaxLength), c: resp[k][SearchVar].value.substr(MaxLength)}];
                     }
 
-
-                    switch (OneResult.Type) {
-                        case 'http://xmlns.com/foaf/0.1/Person':
-                            OneResult.Icon = 'glyphicon glyphicon-user';
-                            break;
-                        case 'http://purl.org/ontology/bibo/Collection':
-                            OneResult.Icon = 'glyphicon glyphicon-folder-open';
-                            break;
-                        default :
-                            OneResult.Icon = 'glyphicon glyphicon-file';
-                            break;
-                    }
-                    var Resourcesfav = Favresources.find({idUser: Meteor.userId()}).fetch();
-
-                    var favorite = Resourcesfav.find(function (val) {
-                        return  val.urifav == OneResult.URI;
-                    });
-                    if (favorite) {
-
-                        OneResult.Fav = "/images/starblue.png";
-
-                    } else {
+                    
+                    OneResult.Icon=lsIcon[''+OneResult.Type];
+                    
+                   
+                    //    OneResult.Fav = "/images/starblue.png";
 
                         OneResult.Fav = "/images/stargray.png";
-
-                    }
 
 
                     // OneResult.Fav = '/images/stargray.png'; 
@@ -2223,11 +2245,7 @@ if (Meteor.isClient) {
 
 
 
-                    //
-                    // console.log (OneResult);
-                    console.log("Resultado 1");
-                    console.log(OneResult);
-
+                    
                     OneResult = OneResult[0];
 
                     if (NumMode == 1) {
@@ -2268,7 +2286,9 @@ if (Meteor.isClient) {
 
                                 console.log("Agrupa");
                                 var separador = '';
-                                if (resp[k].PropertyLabel.value == "Subject") {
+                                
+                                //ConfigInfo.ResultSearchPropertiesGorup
+                                if ((ConfigInfo.ResultSearchPropertiesGorup.indexOf(resp[k].PropertyLabel.value) > -1)  ) {
 
                                     separador = " , ";
                                 } else {
@@ -2320,7 +2340,8 @@ if (Meteor.isClient) {
 
                                 console.log("Agrupa");
                                 var separador = '';
-                                if (SearchVar_ == "Subject") {
+                                //if ((ConfigInfo.ResultSearchPropertiesGorup.indexOf(resp[k].PropertyLabel.value) > -1)  ) {
+                                if ((ConfigInfo.ResultSearchPropertiesGorup.indexOf(SearchVar_) > -1)  ) {
 
                                     separador = " , ";
                                 } else {
