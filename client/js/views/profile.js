@@ -123,3 +123,32 @@ function loadProfile (){
     });
       // return result;
     };
+
+
+    Template.profile.helpers({
+   access_level: function() {
+  if (!_.isNull(Meteor.user())&& !_.isUndefined(Meteor.user())) {
+          var valaccess = Meteor.user().profile.access;
+        console.log (valaccess);
+         return valaccess > 1;
+    } else {
+    return false;
+    }
+   
+  } ,
+
+  access_adv: function() {
+  if (!_.isNull(Meteor.user())&& !_.isUndefined(Meteor.user())) {
+ 
+       // var obj = Meteor.user().profile[1];
+       var valaccess = Meteor.user().profile.access;
+        //obj[Object.keys(obj)[0]];
+     //   console.log (valaccess);
+         return valaccess  > 0;
+    } else {
+    return false;
+    }
+   
+  }
+  
+});

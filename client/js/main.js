@@ -1995,7 +1995,16 @@ if (Meteor.isClient) {
                 return "glyphicon glyphicon-chevron-down";
             }
 
-        }, resourcesavailable : function (){  
+        },  DespRel: function () {
+            var des = Session.get("DespRel");
+            if (des) {
+
+                return "glyphicon glyphicon-chevron-up";
+            } else {
+                return "glyphicon glyphicon-chevron-down";
+            }
+
+        } , resourcesavailable : function (){  
           return types; 
         },
         suggestedQueries: function () {
@@ -2596,6 +2605,7 @@ if (Meteor.isClient) {
             "Date": "Date",
             "Filters": "Filters",
             "Search_action": "Search",
+            "Main_Title" : "Semantic Searcher" ,
             "it": "italien"
         };
 
@@ -2774,6 +2784,7 @@ if (Meteor.isClient) {
             "Date": "Fecha",
             "Filters": "Filtros",
             "Search_action": "Búsqueda",
+            "Main_Title" : "Búscador de Recursos Semánticos" ,
             "it": "italian"
         };
 

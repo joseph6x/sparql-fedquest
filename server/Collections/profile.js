@@ -44,6 +44,20 @@ Profile.allow({
 
 // What to do when the server first starts up
 Meteor.startup(function (){
+    
+
+    /* Accounts.createUser({
+                            username: "Admin",
+                            email : "admin@gtr.com",
+                            password : "df@lt",
+                          
+
+    });*/
+     /*
+  Profile.insert({ nameUser: "Admin", direction: "" , levelAcademic: "0", areasInterest: [], language: "es", password: "", secMail:  "admin@admin.com" , accessLevel: "2"});
+  Meteor.users.update({_id:userId}, {$set:{"profile":{ lang: "es" ,  'access':0 }}});
+    console.log ("Usuario Creado");
+ console.log (usr.emails[0].address);*/
 
     //Fill the collection with some initial data if it's empty
     // Endpoints.remove({});

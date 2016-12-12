@@ -75,8 +75,10 @@
  <div class=" col-xs-5 col-sm-5 selectContainer">
     <select class="form-control " id="accessLevel">
     <option value= 0 >{{ lang "User" }}</option>
+    {{#if access_level }} 
     <option value= 1 >{{ lang "Advanced_User" }}</option>
     <option value= 2 >{{ lang "Admin"}}</option>
+    {{/if}}
      </select>
     </div>
     </div>

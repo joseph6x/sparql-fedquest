@@ -203,12 +203,14 @@ this.SearchView = Backbone.View.extend({
     // setEvents: function (divNode) {
     setEvents: function (divNode) {
         var FromList = [];
+        Session.set('DespRel', true);
         Session.set('DespSug', true);
         Session.set('DespFac', true);
 
         $("#pfac").css("min-height", "40px");
         $("#sug").collapse('show');
         $("#fac").collapse('show');
+        //$("#rel").collapse('show');
 
         var term = Session.get('s1');
         var type = Session.get('s2');
@@ -1136,6 +1138,24 @@ desplegar2 = function (e) {
     } else {
         $("#fac").collapse('show');
         Session.set('DespFac', true);
+        //$(".sugestion-panel").css ("min-height", "400px");
+        //   $("#sug").collapse();
+    }
+    //alert ("Desplegar");
+}
+
+ desplegar3 = function (e) {
+    // $("#sug").collapse('toggle');
+
+    if (Session.get('DespRel')) {
+        $("#related").css("min-height", "40px");
+        $("#rel").collapse('hide');
+        Session.set('DespRel', false);
+        // $(".sugestion-panel").css ("min-height", "400px");
+
+    } else {
+        $("#rel").collapse('show');
+        Session.set('DespRel', true);
         //$(".sugestion-panel").css ("min-height", "400px");
         //   $("#sug").collapse();
     }

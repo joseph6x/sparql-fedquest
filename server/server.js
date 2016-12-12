@@ -83,12 +83,13 @@ AccountsTemplates.configure({
 Hooks.onCreateUser = function (userId) { 
  //alert ("Login");
  var usr = Meteor.users.findOne({'_id':userId});
+ if (typeof usr.profile === 'undefined'){
 
   Profile.insert({idProfile: userId , nameUser: "", direction: "" , levelAcademic: "0", areasInterest: [], language: "es", password: "", secMail:  usr.emails[0].address , accessLevel: "0"});
   Meteor.users.update({_id:userId}, {$set:{"profile":{ lang: "es" ,  'access':0 }}});
     console.log ("Usuario Creado");
- console.log (usr.emails[0].address);
-
+  console.log (usr.emails[0].address);
+  }
 
  }; 
 
@@ -2378,8 +2379,20 @@ Api.addRoute('sparql', {authRequired: false}, {
                 //   console.log ("Validado");
                 //    console.log (isValid);
                 // check({admin: true}, mySchema);
+                var certified = true;
+                 if ( access > 0  ) {
+                    if (validar (1)){
+                      var certified = true; 
+                    }else {
+                      var certified = false; 
+                    }
+                  
+                 } else {
+                    var certified = true; 
+                 }
+                
 
-                if (this.userId == id && isValid) {
+                if (this.userId == id && isValid && certified ) {
                     if (!_.isUndefined(profile)) {
 
                         /*   console.log ("Almacenando");
