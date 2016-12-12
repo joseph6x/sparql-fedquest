@@ -61,8 +61,8 @@
        <div class=col-md-12 col-md-offset-4> 
         <div class="cc-selector"> 
         {{#each resourcesavailable}}
-        <input id="{{Tipo}}" type="radio" name="opciones" value="{{Tipo}}"  />
-        <label style="background-image:url('{{Imagen}}');" tipo= "{{Tipo}}" class="opciones-cc {{Tipo}}" select="0" onclick="updatebuttons('{{Tipo}}')" for="{{Imagen}}" data-toggle="tooltip" title="{{Description}}"></label>
+        <input id="{{Name}}" type="radio" name="opciones" value="{{Name}}"  />
+        <label style="background-image:url('{{Imagen}}');" tipo= "{{Name}}" class="opciones-cc {{Name}}" select="0" onclick="updatebuttons('{{Name}}')" for="{{Imagen}}" data-toggle="tooltip" title="{{Description}}"></label>
         {{/each}}
       <!--   <input id="autores" type="radio" name="opciones" value="autores" />
         <label style="background-image:url('/images/ndsd.png');" class="opciones-cc autores" for="autores" data-toggle="tooltip" title={{lang "tip-author"}}></label>

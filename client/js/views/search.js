@@ -296,17 +296,9 @@ this.SearchView = Backbone.View.extend({
                 }
 
                 var t__ = "T";
-                var EntitySearch = get_radio_value("opciones");
-                switch (EntitySearch) {
-                    case 'autores':
-                        t__ = "P";
-                        break;
-                    case 'documentos':
-                        t__ = "D";
-                        break;
-                    case 'colecciones':
-                        t__ = "C";
-                        break;
+                var EntitySearch = $('label[select="1"]').attr('tipo');
+                if (EntitySearch != undefined) {
+                    t__=EntitySearch;
                 }
                 if (term != null && term.trim().length > 3) {
 
@@ -389,129 +381,82 @@ this.SearchView = Backbone.View.extend({
 
         $('input.runSearch').on('click', function (ev) {
 
-            //Session.set("auxAct", Session.get("auxAct") + 1);
-            //App.resultCollection2.remove({});
-            //var EntitySearch = get_radio_value("resourceType");
-
-
-            //var EntitySearch = get_radio_value("opciones");
-            var EntitySearch = $('label[select="1"]').attr('tipo');
-
+            var ConfigInfo = Session.get('ConfigInfo');
+            
+            var EntitySearch = "T";
+            var EntitySearch2 = $('label[select="1"]').attr('tipo');
+            if (EntitySearch2 != undefined) {
+                    EntitySearch=EntitySearch2;
+            }
             var FromListaux = get_checkList_values("repositoriesList");
             if (FromListaux.length > 0) {
-
                 FromList = FromListaux;
-
             }
 
             var TextSearch = $("input.textToSearch").val().clearWords();
             var originTextSearch = $("input.textToSearch").val();
-            // alert(FromList);
-            // console.log($('input[data-name='+base+']'));
-            //console.log("Radio");
-            // console.log(EntitySearch);
-            // console.log("check");
-            // console.log(FromList);
-            // console.log("text");
-            //  console.log(TextSearch);
-
-
+          
             var ResultLimit = ''; //limit 100
-            var DocSearchRequest = {};
-            DocSearchRequest.resourceClass = 'http://purl.org/ontology/bibo/Document';
-            DocSearchRequest.indexProperties = ['http://purl.org/ontology/bibo/abstract', 'http://purl.org/dc/terms/title', 'http://purl.org/dc/terms/subject'];
-            DocSearchRequest.indexPropertiesName = ['Abstract', 'Title', 'Subject'];
-            DocSearchRequest.labelProperty = 'http://purl.org/dc/terms/title';
 
-            var AuthSearchRequest = {};
-
-            AuthSearchRequest.resourceClass = 'http://xmlns.com/foaf/0.1/Person';
-            AuthSearchRequest.indexProperties = ['http://xmlns.com/foaf/0.1/name'];
-            AuthSearchRequest.indexPropertiesName = ['Name'];
-            AuthSearchRequest.labelProperty = 'http://xmlns.com/foaf/0.1/name';
-
-            var ColSearchRequest = {};
-
-            ColSearchRequest.resourceClass = 'http://purl.org/ontology/bibo/Collection';
-            ColSearchRequest.indexProperties = ['http://purl.org/dc/terms/description'];
-            ColSearchRequest.indexPropertiesName = ['Description'];
-            ColSearchRequest.labelProperty = 'http://purl.org/dc/terms/description';
-
-            //Session.set('Qmode2', 0);
             var AppFilt = false;
 
             var ResqLis = [];
-            switch (EntitySearch) {
-
-                case 'documentos':
-                    {
-                        ResqLis.push(DocSearchRequest);
+            var MC=ConfigInfo.MainClasses;
+            
+            for (var qm=0; qm<MC.length; qm++){
+                if (MC[qm].Name==EntitySearch || EntitySearch=="T"){
+                    var clss={};
+                    
+                    clss.EntityName=MC[qm].Name;
+                    clss.resourceClass =MC[qm].URI;
+                    clss.indexProperties  =MC[qm].indexProperties;
+                    clss.indexPropertiesName  =MC[qm].indexProperties.map(function (a){
+                        
+                        return a.split("").reverse().join("").split(/\/|#/)[0].split("").reverse().join("");;
+                        
+                    });
+                    
+                    clss.YQ=MC[qm].YearQuery;
+                    clss.LQ=MC[qm].LangQuery;
+                    clss.TQ=MC[qm].TypeQuery;
+                    
+                    clss.labelProperty = MC[qm].labelProperty;
+                    
+                    ResqLis.push(clss);
+                    if(MC[qm].Name==EntitySearch){
+                        AppFilt=MC[qm].ApplyFilter;
                     }
-                    break;
-                case 'autores':
-                    {
-                        ResqLis.push(AuthSearchRequest);
-                        AppFilt = true;
-                    }
-                    break;
-                case 'colecciones':
-                    {
-                        ResqLis.push(ColSearchRequest);
-                        AppFilt = true;
-                    }
-                    break;
-                default:
-                    {
-                        ResqLis.push(DocSearchRequest);
-                        ResqLis.push(AuthSearchRequest);
-                        ResqLis.push(ColSearchRequest);
-                    }
-                    break;
+                }
             }
 
 
             //}
-            var usr = Profile.findOne({idProfile: Meteor.userId()});
-            var idi = 'none';
-            var ty = '1';
-            var int = '';
-            if (usr) {
-                idi = usr.language;
-                if (usr.levelAcademic == 1) {
-                    ty = 2;
-                }
-                if (usr.levelAcademic == 2) {
-                    ty = 3;
-                }
-                if (usr.areasInterest != undefined && Array.isArray(usr.areasInterest)) {
-                    var inte = usr.areasInterest;
-                    for (var sd = 0; sd < inte.length; sd++) {
-                        int += '(' + AndStr(lang.getDictionnary('es')['FoS_' + inte[sd]]) + ') OR ';
-                        int += '(' + AndStr(lang.getDictionnary('en')['FoS_' + inte[sd]]) + ')' + ((sd != inte.length - 1) ? ' OR ' : '');
-                    }
-                }
-            }
-            if (int == '') {
-                int = '_';
-            }
-            //
+            
             var Query = "prefix text:<http://jena.apache.org/text#>\n";
 
             Query += 'select *  {\n';
 
             if (!AppFilt) {
                 TextSearch = TextSearch.trim().replace(/\s+/g, ' ');
-
                 TextSearch = TextSearch.replace(/\s/g, " AND ");
             }
             var ResultLimitSubQ = (AppFilt) ? '15' : '1000';
             var SubQN = 0;
-            var sources = [];
             for (var oneQuery = 0; oneQuery < FromList.length; oneQuery++) {
                 var EndpointLocal = FromList[oneQuery].attributes['data-base'] ? FromList[oneQuery].attributes['data-base'].value : false;
                 var Service = FromList[oneQuery].attributes['data-endpoint'].value;
                 var ServiceName = FromList[oneQuery].attributes['data-name'].value;
+                var Endpoint__=ConfigInfo.Repositories.filter(function (a){
+                        return a.Name==ServiceName;
+                    });
                 for (var oneRes = 0; oneRes < ResqLis.length; oneRes++) {
+                    var Class__=Endpoint__[0].ClassesSearch.filter(function (a){
+                        return a==ResqLis[oneRes].EntityName;
+                    });
+                    
+                    if (Class__.length==0){
+                        continue;
+                    }
                     for (var oneProp = 0; oneProp < ResqLis[oneRes].indexProperties.length; oneProp++) {
                         SubQN++;
                         if (SubQN == 1) {
@@ -526,17 +471,13 @@ this.SearchView = Backbone.View.extend({
                         var Property_ = ResqLis[oneRes].indexProperties[oneProp];
                         var PropertyName_ = ResqLis[oneRes].indexPropertiesName[oneProp];
                         var Label_ = ResqLis[oneRes].labelProperty;
-                        Query += 'select   ?Score1 (\'' + ServiceName + '\' AS ?Endpoint) ?EntityURI (IRI(<' + Class_ + '>) AS ?EntityClass) ?EntityLabel (IRI(<' + Property_ + '>) AS ?Property) (\'' + PropertyName_ + '\' AS ?PropertyLabel) ?PropertyValue  (max(?Year1)as ?Year) (max(?Lang1) as ?Lang) (max(?Type1) as ?Type)  ((?Score1*if(count(?Score2)>0,2,1)*if(count(?Score3)>0,2,1)*if(count(?Score4)>0,' + ty + ',1)) as ?Score ) \n'; //(group_concat(?Sub1; separator = "#|#") as ?Sub)
+                        Query += 'select   ?Score1 (\'' + ServiceName + '\' AS ?Endpoint) ?EntityURI (IRI(<' + Class_ + '>) AS ?EntityClass) ?EntityLabel (IRI(<' + Property_ + '>) AS ?Property) (\'' + PropertyName_ + '\' AS ?PropertyLabel) ?PropertyValue  (max(?Year1)as ?Year) (max(?Lang1) as ?Lang) (max(?Type1) as ?Type)  (?Score1 as ?Score ) \n'; //(group_concat(?Sub1; separator = "#|#") as ?Sub)
                         Query += '{\n';
-                        Query += '(?EntityURI ?Score1 ?PropertyValue) text:query (<' + Property_ + '> \'(' + TextSearch + ')\' ' + ResultLimitSubQ + ') .\n?EntityURI <' + Label_ + '> ?EntityLabel .\n';
+                        Query += '(?EntityURI ?Score1 ?PropertyValue) text:query (<' + Property_ + '> \'(' + TextSearch + ')\' ' + ResultLimitSubQ + ') .\n ?EntityURI a <'+Class_+'> . \n ?EntityURI <' + Label_ + '> ?EntityLabel .\n';
                         Query += 'filter(str(?PropertyValue)!=\'\') .\n';
-                        Query += "optional { (?EntityURI ?Score2 ?PropertyValue2) text:query (<http://purl.org/dc/terms/subject> '(" + int + ")' ) .  filter(str(?EntityURI)!=\'\') .} \n"
-                        //Query += "optional { ?EntityURI <http://purl.org/dc/terms/subject> ?Sub1 .  } \n"
-                        Query += "optional { ?EntityURI <http://purl.org/dc/terms/language> ?Lang1 .   } \n"
-                        Query += "optional { ?EntityURI <http://purl.org/dc/terms/language> ?Lang2 .  filter(str(?Lang2) = '" + idi + "'). bind( 1 as ?Score3  ).  } \n"
-                        Query += "optional { ?EntityURI <http://purl.org/dc/terms/issued> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }\n";
-                        Query += "optional { ?EntityURI a ?Type1 . filter (str(?Type1) != 'http://xmlns.com/foaf/0.1/Agent' &&  str(?Type1) != 'http://purl.org/ontology/bibo/Document') .   } \n"
-                        Query += "optional { {?EntityURI a <http://purl.org/ontology/bibo/Article> .  bind(1 as ?Score4  ). } union { ?EntityURI a <http://purl.org/net/nknouf/ns/bibtex#Mastersthesis> .  bind(1 as ?Score4  ). }  } \n"
+                        Query += ResqLis[oneRes].TQ+'\n';
+                        Query += ResqLis[oneRes].YQ+'\n';
+                        Query += ResqLis[oneRes].LQ+'\n';
                         Query += '} group by ?Endpoint ?EntityURI ?EntityClass ?EntityLabel ?Property ?PropertyLabel ?PropertyValue ?Score1  \n';
                         if (!EndpointLocal) {
                             Query += '}\n';
@@ -544,19 +485,10 @@ this.SearchView = Backbone.View.extend({
                         Query += '}\n';
                     }
                 }
-                var source = {};
-                source.Name = ServiceName;
-                source.Endpoint = Service;
-                sources.push(source);
+               
 
             }
-            console.log("Hasta aqui");
-            console.log(sources);
-            if (!_.isNull(Meteor.userId())) {
-                var rest = Meteor.call('savesearch', originTextSearch, sources, EntitySearch, function (error, result) {
-                    console.log(result);
-                });
-            }
+            
 
             Query += ' . filter(str(?EntityURI)!=\'\') . }  order by DESC(?Score)  \n  ' + ResultLimit;
             var jsonRequest = {"sparql": Query, "validateQuery": false, "MainVar": "EntityURI", "ApplyFilter": AppFilt};
@@ -780,32 +712,29 @@ ValidateSuggestionQuery = function (query) {
 };
 
 actAHyper = function (e) {
-    //Session.set("auxAct", Session.get("auxAct") + 1);
-    //App.resultCollection2.remove({});
+    var ConfigInfo = Session.get('ConfigInfo');
 
-    var usr = Profile.findOne({idProfile: Meteor.userId()});
-    var idi = 'none';
-    var ty = '1';
-    var int = '';
-    if (usr) {
-        idi = usr.language;
-        if (usr.levelAcademic == 1) {
-            ty = 2;
-        }
-        if (usr.levelAcademic == 2) {
-            ty = 3;
-        }
-        if (usr.areasInterest != undefined && Array.isArray(usr.areasInterest)) {
-            var inte = usr.areasInterest;
-            for (var sd = 0; sd < inte.length; sd++) {
-                int += '(' + AndStr(lang.getDictionnary('es')['FoS_' + inte[sd]]) + ') OR ';
-                int += '(' + AndStr(lang.getDictionnary('en')['FoS_' + inte[sd]]) + ')' + ((sd != inte.length - 1) ? ' OR ' : '');
-            }
-        }
-    }
-    if (int == '') {
-        int = '_';
-    }
+        var EntitySearch2 = get_radio_value("opciones");
+        var EntitySearch='T';
+            switch (EntitySearch2) {
+                    case 'autores':
+                        EntitySearch = "Agent";
+                        break;
+                    case 'documentos':
+                        EntitySearch = "BibliographicResource";
+                        break;
+                    case 'colecciones':
+                        EntitySearch = "Collection";
+                        break;
+                }
+        
+        var cl=ConfigInfo.MainClasses.filter(function (a){
+            return a.Name==EntitySearch;
+        });
+        cl=cl[0];
+
+
+   
 
 
 
@@ -820,10 +749,7 @@ actAHyper = function (e) {
         resp = resp[0];
         respp = 1;
     } else {
-        var EntitySearch = get_radio_value("opciones");
-        if (EntitySearch != "documentos") {
-            AppFilt = true;
-        }
+        AppFilt = cl.ApplyFilter;
         respp = 2;
         resp = sq.match(new RegExp("\\((.*)\\)(.*)\\((.*)\\)", "g"))[0];
     }
@@ -854,11 +780,11 @@ actAHyper = function (e) {
             varia2 = res[1] + ' ' + txtvar + SearchVar + ' ?Endpoint';
         }
 
-        varia = res[1] + ' ' + txtvar + SearchVar + ' ?Endpoint (max(?Year1) as ?Year) (max(?Lang1) as ?Lang) (max(?Type1) as ?Type) ((?Score1*if(count(?Score2)>0,2,1)*if(count(?Score3)>0,2,1)*if(count(?Score4)>0,' + ty + ',1)) as ?Score ) '; //(group_concat(?Sub1; separator = "#|#") as ?Sub)
+        varia = res[1] + ' ' + txtvar + SearchVar + ' ?Endpoint (max(?Year1) as ?Year) (max(?Lang1) as ?Lang) (max(?Type1) as ?Type) (?Score1 as ?Score ) '; //(group_concat(?Sub1; separator = "#|#") as ?Sub)
     }
     //Obtener original
 
-    var NewSQ = sq.replace(new RegExp("SELECT DISTINCT ", "g"), 'SELECT DISTINCT ' + txtvar + SearchVar + ' ?Year1 ?Lang1 ?Type1 ?Score1 ?Score2 ?Score3 ?Score4 ');
+    var NewSQ = sq.replace(new RegExp("SELECT DISTINCT ", "g"), 'SELECT DISTINCT ' + txtvar + SearchVar + ' ?Year1 ?Lang1 ?Type1 ?Score1  ');
     NewSQ = NewSQ.replace(new RegExp("FROM(.*)", "g"), '');
     var TextSearch = $(".textToSearch").val();
     if (respp == 2) {
@@ -900,14 +826,17 @@ actAHyper = function (e) {
         if (!EndpointLocal) {
             Query += 'service <' + Service + '> {\n';
         }
-        var NewSQ2 = NewSQ.replace(new RegExp("SELECT DISTINCT", "g"), "SELECT DISTINCT ('" + ServiceName + "' AS ?Endpoint) ?Score2 ?Score3 ?Score4 ");
+        var NewSQ2 = NewSQ.replace(new RegExp("SELECT DISTINCT", "g"), "SELECT DISTINCT ('" + ServiceName + "' AS ?Endpoint)  ");
         var sr = '';
         if (respp == 2) {
             sr = "";
         } else {
             sr = "  bind(1 as ?Score1). ";
         }
-        NewSQ2 = NewSQ2.replace(/\}\n\}$/, sr + "optional { (" + MainVar + " ?Score2 ?PropertyValue2) <http://jena.apache.org/text#query> (<http://purl.org/dc/terms/subject> '(" + int + ")' ) .    filter(str(" + MainVar + ")!=\'\') . } \n   optional { " + MainVar + " <http://purl.org/dc/terms/language> ?Lang1 .  } \n optional { " + MainVar + " <http://purl.org/dc/terms/language> ?Lang2 .  filter(str(?Lang2) = '" + idi + "'). bind( 1 as ?Score3  ).  } \n optional { " + MainVar + " <http://purl.org/dc/terms/issued> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?Year1 ).  }\n  optional { " + MainVar + " a ?Type1 . filter (str(?Type1) != 'http://xmlns.com/foaf/0.1/Agent' &&  str(?Type1) != 'http://purl.org/ontology/bibo/Document')  } \n optional { {" + MainVar + " a <http://purl.org/ontology/bibo/Article> .  bind(1 as ?Score4  ). } union { " + MainVar + " a <http://purl.org/net/nknouf/ns/bibtex#Mastersthesis> .  bind(1 as ?Score4  ). }  } \n }} ");
+        var addqry=cl.LangQuery.replace('?EntityURI', MainVar )+'\n';
+        addqry+=cl.YearQuery.replace('?EntityURI', MainVar )+'\n';
+        addqry+=cl.TypeQuery.replace('?EntityURI', MainVar )+'\n';
+        NewSQ2 = NewSQ2.replace(/\}\n\}$/, sr +'\n'+ addqry+' }}');
 
         Query += NewSQ2 + "\n";
         if (!EndpointLocal) {
