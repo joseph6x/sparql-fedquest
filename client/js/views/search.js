@@ -202,6 +202,11 @@ this.SearchView = Backbone.View.extend({
     },
     // setEvents: function (divNode) {
     setEvents: function (divNode) {
+    $( "#sortable" ).sortable();
+    $( "#sortable" ).disableSelection();
+
+    //$( "#slider-related" ).slider();
+
         var FromList = [];
         Session.set('DespRel', true);
         Session.set('DespSug', true);
@@ -210,7 +215,8 @@ this.SearchView = Backbone.View.extend({
         $("#pfac").css("min-height", "40px");
         $("#sug").collapse('show');
         $("#fac").collapse('show');
-
+        $("#related").css("min-height", "40px");
+        $("#rel").collapse('show');
         var term = Session.get('s1');
         var type = Session.get('s2');
         var base = Session.get('s3')
@@ -237,6 +243,7 @@ this.SearchView = Backbone.View.extend({
         // var FromList = get_checkList_values("repositoriesList");
         //console.log($('input[data-name='+base+']'));
         //console.log (FromList);
+
 
         function get_radio_value(RadioName) {
             var inputs = document.getElementsByName(RadioName);
@@ -447,9 +454,13 @@ this.SearchView = Backbone.View.extend({
                 var EndpointLocal = FromList[oneQuery].attributes['data-base'] ? FromList[oneQuery].attributes['data-base'].value : false;
                 var Service = FromList[oneQuery].attributes['data-endpoint'].value;
                 var ServiceName = FromList[oneQuery].attributes['data-name'].value;
+               
                 var Endpoint__=ConfigInfo.Repositories.filter(function (a){
                         return a.Name==ServiceName;
                     });
+                console.log (ConfigInfo.Repositories);
+                console.log (ServiceName);
+                console.log (Endpoint__[0]);
                 for (var oneRes = 0; oneRes < ResqLis.length; oneRes++) {
                     var Class__=Endpoint__[0].ClassesSearch.filter(function (a){
                         return a==ResqLis[oneRes].EntityName;
@@ -869,6 +880,16 @@ function selec2(prev, val) {
     Session.set('auxAct', Session.get('auxAct') + 1);
     return prev;
 }
+showrel = function (URI, label)
+{
+ //desplegar3();
+ //$("#rel").collapse('show'); 
+ $('.relatedbase').html("<b>Base:</b><br>"+label+"(<a target=_blank href="+URI+">"+URI+"</a>)"); 
+ if (!Session.get('DespRel')) { 
+    desplegar3 ();
+ };
+ //$('.relatedbase').html("<b>Base:</b><br>"+URI+"<br>Nombre:<br>"+label); 
+}
 
 qrmodalshow = function (e, base, type) {
     console.log(e);
@@ -1089,3 +1110,34 @@ desplegar2 = function (e) {
     }
     //alert ("Desplegar");
 }
+   sliderfun = function (e ,n){
+    console.log(e);
+    $( "#"+e ).slider({
+     max: 50 ,
+     min: 1 , 
+     value: 50 ,
+     stop: function( event, ui ) { console.log (ui);console.log (ui.value); $("#amount"+n).text('('+ui.value+')'); console.log (event);}
+
+    });    
+
+   }
+
+   checktype = function (e) {
+    console.log ("ENTRA CHECK");
+    console.log (e);
+    if (e == Session.get('s2') )
+    {
+     updatebuttons2 (e);
+    }
+    
+   }
+
+
+   runres = function () {
+
+   console.log ("RUN");
+   var optionTexts = [];
+   $("#sortable li").each(function() { optionTexts.push($(this).attr('Num')) });
+   console.log (optionTexts);
+   }
+//$( "#slider-related" ).slider();

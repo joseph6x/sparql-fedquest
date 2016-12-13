@@ -666,7 +666,12 @@ var num_auto=0;
                 }
                 lsend = foo;
             }
+            ///Ajuste JS
             var endpoint_i = Math.floor(cont / proper.length);
+            //endpoint_i=endpoint_i-1;
+            console.log (endpoint_i);
+            console.log (endp);
+             console.log (lsend);
             var prope_i = cont % proper.length;
             var endpoint = endp[lsend[endpoint_i]];
             var _spar = spar.replace(new RegExp("---", "g"), proper[prope_i].p);

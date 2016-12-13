@@ -234,7 +234,7 @@ ul#Sugerencias  li{
 #dwnload
 {
     cursor: pointer;
-    left: 42%;
+    left: 40%;
     position: relative;
 }
 
@@ -296,3 +296,29 @@ border-radius: 5px;
     top: 2px;
     cursor: pointer;
 }
+
+  #sortable { list-style-type: none; margin: 0; padding: 0; width: 90%; }
+  #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em;   }
+  #sortable li span { position: absolute;  margin-left: 2%; }
+
+  .glyphicon-sort {
+    margin-top: 4%;
+  }
+
+  .sorticon {
+    margin-left: -5%;
+    margin-right: 3%;
+  }
+
+  #divrelated {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  #relatedbutton {
+    margin-left: 20%;
+  }
+
+.spanrel {
+  margin-left: 2%;
+  }

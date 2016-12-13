@@ -46,7 +46,7 @@
         <div class="cc-selector"> 
         {{#each resourcesavailable}}
         <input id="{{Name}}" type="radio" name="opciones" value="{{Name}}"  />
-        <label style="background-image:url('{{Imagen}}');width: 35px;height: 35px;" tipo= "{{Name}}" class="opciones-cc {{Name}}" select="0" onclick="updatebuttons2('{{Name}}')" for="{{Imagen}}" data-toggle="tooltip" title="{{Description}}"></label>
+        <label style="background-image:url('{{Imagen}}');width: 35px;height: 35px;" tipo= "{{Name}}" class="opciones-cc {{Name}}" select="0" onclick="updatebuttons2('{{Name}}')" for="{{Imagen}}" data-toggle="tooltip" title="{{Description}}"></label><script> $(function(){ checktype('{{Name}}'); }); </script>
         {{/each}}
         </div> 
         </div>
@@ -91,16 +91,27 @@
 					<span id="Title-suggestion" > <b> Recursos Relacionados  </b>  </span>
 					<span class = "{{DespRel}}" id= "expandrel"  onclick = "desplegar3 (this)"  > </span>
 					<div class="result-suggestion collapse" id = "rel">
-						
-					<UL type = "disk" id="Sugerencias">
-        			<!--<li> Buscar por autores con nombre "DIEGO" </li> onclick = "desplegar (this)" data-toggle="collapse" data-target="#sug"
-        			<li> Buscar colecciones que contenga obras cuyo autor se llame "Diego" </li>
-        			<li> Buscar obras cuyo autor se llame "DIEGO" </li>
-        			<li>Perú </li> -->
-        			<!--{{#each suggestedQueries}}
+					<div class="relatedbase" >	
+						<!--<input type="text" id="resourcebaserel" name="fname">-->
+						 
+					</div>
+					<hr id = "divrelated"  size="2">
+					<div class="listendpoints">
+						<ul id="sortable">
+							  <li Num="1" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >Cepalstat <span id="amount1" class="spanrel"> </span> <div id="slider-related1" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related1','1'); }); </script></li>
+  							  <li Num="2" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >Repositorio <span id="amount2" class="spanrel"> </span> <div id="slider-related2" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related2', '2'); }); </script></li>
+  							  <li Num="3" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >Biblioguias <span id="amount3" class="spanrel"> </span> <div id="slider-related3" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related3','3'); }); </script></li>
+						</ul>	
+					</div>	
+					<hr id = "divrelated" size="2">
+					  <input id = "relatedbutton" type="button" value={{lang "run-query"}}  class="btn btn-default" onclick="runres()" >  
+
+					<!--<UL type = "disk" id="Sugerencias">
+        			
+        			{{#each suggestedQueries}}
         			  	<li class="suggestion-group"><a data-title ="{{title}}" href='#' onclick="actAHyper(event);" >{{description}}</a></li>
-					{{/each}} -->
-        			</UL>  
+					{{/each}} 
+        			</UL>  -->
 					</div>
 				</div>
                             
@@ -265,8 +276,8 @@ el proceso en la publicación de LOD. </p>
 			<!--<span class="{{Icon}}"></span>-->
                         <img src="{{Icon}}" width=20px >
 			{{Origin}}
-			 <a href="#" title="QR Code" class="qricon" datauri ="{{URI}}"  onclick="qrmodalshow('{{URI}}','{{Origin}}','{{Icon}}');"   ><img src="/images/qr.png" width=14px ></a> 
-			 <span id="dwnload" class="glyphicon glyphicon-save" onclick="download('{{URI}}')"> </span>
+			 <a href="#" title="Relacionados" class="qricon" datauri ="{{URI}}"  onclick="showrel('{{URI}}', '{{Label}}')"   ><img src="/images/qr.png" width=14px ></a> 
+			 <span id="dwnload" class="glyphicon glyphicon-save" onclick="download('{{URI}}',)"> </span>
 			<!--<a href="#" class="qricon" onclick="alert ('hola');"  >o</a>  -->
 			  <!-- <button type="button"  class="qricon" data-toggle="modal"  onclick="qrmodalshow(event);" data-target="#myqrmodal"> </button>-->
 			</div>
