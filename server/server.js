@@ -146,7 +146,17 @@ function merge_(obj1, obj2) {
         result[key] = obj2[key];
     return result;
 }
-
+Array.prototype.getUnique = function(){
+   var u = {}, a = [];
+   for(var i = 0, l = this.length; i < l; ++i){
+      if(u.hasOwnProperty(this[i])) {
+         continue;
+      }
+      a.push(this[i]);
+      u[this[i]] = 1;
+   }
+   return a;
+}
 
 String.prototype.hashCode = function () {
     var a = 0, b, c, d;
@@ -613,6 +623,8 @@ var num_auto=0;
         return parser.text('every 1 seconds');
       },
       job: function() {
+	var ConfigInfo = Meteor.call('ConfigInfo');
+          
 	var endp = Endpoints.find().fetch();
         for (; ; ) {
             var pend = Cache.find({queue: {$exists: true}}, {sort: {qord: -1}, limit: 1}).fetch();
@@ -633,27 +645,20 @@ var num_auto=0;
             var lsend = sug.lsend;
             var cont = sug.cont;
             var resp = sug.resp;
-            var spar = "select distinct ?p ?Score { (?e ?Score ?p) <http://jena.apache.org/text#query> (<---> '___' 3) } order by desc(?Score)";
+            var spar = "select distinct ?p ?Score { (?e ?Score ?p) <http://jena.apache.org/text#query> (<---> '___' 1000) . ?e a <%%%>. } order by desc(?Score) limit 3";
             spar = spar.replace(new RegExp("___", "g"), query);
             var proper = [];
-            switch (clas_) {
-                case 'P':
-                    proper.push('http://xmlns.com/foaf/0.1/name');
-                    break;
-                case 'D':
-                    proper.push('http://purl.org/dc/terms/subject');
-                    proper.push('http://purl.org/dc/terms/title');
-                    break;
-                case 'C':
-                    proper.push('http://purl.org/dc/terms/description');
-                    break;
-                case 'T':
-                    proper.push('http://xmlns.com/foaf/0.1/name');
-                    proper.push('http://purl.org/dc/terms/subject');
-                    proper.push('http://purl.org/dc/terms/description');
-                    proper.push('http://purl.org/dc/terms/title');
-                    break;
+            var MC=ConfigInfo.MainClasses;
+            for (var qm=0; qm<MC.length; qm++){
+                if (MC[qm].Name==clas_ || clas_=="T"){
+                    var ls__y = MC[qm].AutocompleteProperties;
+                    for (var qmm=0; qmm<ls__y.length; qmm++ ){
+                        proper.push({p: ls__y[qmm], c: MC[qm].URI, cn:MC[qm].Name});
+                    }
+                }
             }
+            
+            
             if (lsend == null) {
                 var foo = [];
                 for (var i = 0; i < endp.length; i++) {
@@ -664,15 +669,37 @@ var num_auto=0;
             var endpoint_i = Math.floor(cont / proper.length);
             var prope_i = cont % proper.length;
             var endpoint = endp[lsend[endpoint_i]];
-            var _spar = spar.replace(new RegExp("---", "g"), proper[prope_i]);
+            var _spar = spar.replace(new RegExp("---", "g"), proper[prope_i].p);
+            _spar = _spar.replace(new RegExp("%%%", "g"), proper[prope_i].c);
             var objQuery={sparql: _spar, ep: endpoint.endpoint, gr: endpoint.graphURI};
-            var result = Meteor.call('doQueryCacheStats', objQuery);
+            
+            var result = {resultSet:{value:'{  "head": {    "vars": [ "p" , "Score" ]  } ,  "results": {    "bindings": [          ]  }}'}};
+                    
+            var cendp = ConfigInfo.Repositories.filter(function (a){
+                return a.Name==endpoint.name;
+            });
+            cendp=cendp[0];
+            var cvarlisc=cendp.Classes.filter(function (a){
+                return a==proper[prope_i].cn;
+            });
+            
+            if (cvarlisc.length!=0){
+                result=Meteor.call('doQueryCacheStats', objQuery);    
+                
+            }
+            
+            
+
+
+            
             
             if (result == null || result == undefined || result.resultSet == null || result.resultSet== undefined || result.resultSet.value == null || result.resultSet.value== undefined )
             {
                 console.log('Error Sugg_ '+JSON.stringify(objQuery));
                 continue;
             }
+            
+            
             var r = result.resultSet.value;
             var lsp = JSON.parse(r).results.bindings;
             for (var k = 0; k < lsp.length; k++) {
@@ -789,46 +816,34 @@ Api.addRoute('sparql', {authRequired: false}, {
             eventsOnHooksInit: function () {},
             updateStats: function () {
 
+                
+                var ConfigInfo = Meteor.call('ConfigInfo');
                 var __mongo_stats = [];
                 var endp = Endpoints.find().fetch();
-                //Numero totales
-                var sparql_p = "select (count(*) AS ?P) ('__' AS ?EP) {?x a <http://xmlns.com/foaf/0.1/Person>}";
-                var sparql_d = "select (count(*) AS ?D) ('__' AS ?EP) {?x a <http://purl.org/ontology/bibo/Document>}";
-                var sparql_c = "select (count(*) AS ?C) ('__' AS ?EP) {?x a <http://purl.org/ontology/bibo/Collection>}";
-                //Consulta  
-                var sparql_ = 'select * {\n';
-                for (var i = 0; i < endp.length; i++) {
-                    var endpoint = endp[i];
-                    sparql_ += '{service <' + endpoint.endpoint + '> {' + '\n';
-                    sparql_ += sparql_p.replace(new RegExp("__", "g"), endpoint.name) + '\n';
-                    sparql_ += '}}union' + '\n';
-                    sparql_ += '{service <' + endpoint.endpoint + '> {' + '\n';
-                    sparql_ += sparql_d.replace(new RegExp("__", "g"), endpoint.name) + '\n';
-                    sparql_ += '}}union' + '\n';
-                    sparql_ += '{service <' + endpoint.endpoint + '> {' + '\n';
-                    sparql_ += sparql_c.replace(new RegExp("__", "g"), endpoint.name) + '\n';
-                    sparql_ += '}}' + '\n';
-                    if (i != endp.length - 1) {
-                        sparql_ += 'union' + '\n';
-                    }
-                }
-                sparql_ += '}';
-                //Preprocesamiento  
-                var r = Meteor.call('doQueryCacheStats', {sparql: sparql_}).resultSet.value;
-                var Obj = JSON.parse(r).results.bindings;
                 var Stats1 = [];
                 for (var i = 0; i < endp.length; i++) {
-                    var ls = Obj.filter(function (a) {
-                        return a.EP.value == endp[i].name;
+                    var endpoint = endp[i];
+                    var Repo= ConfigInfo.Repositories.filter(function (a){
+                        return a.Name==endpoint.name;
                     });
-                    var result1 = {};
-                    var result = {};
-                    result1 = merge_(ls[0], ls[1]);
-                    result = merge_(result1, ls[2]);
-                    Stats1.push(result);
+                    Repo=Repo[0];
+                    for (var j = 0; j < Repo.StatsResources.length; j++){
+                        var entre=Repo.StatsResources[j];
+                        var Cla=ConfigInfo.MainClasses.filter(function (a){
+                            return entre==a.Name;
+                        });
+                        Cla=Cla[0].URI;
+                        var sparql_ = 'select * {\n';                       
+                        sparql_+="service <"+endpoint.endpoint+"> { select (count(*) AS ?C) ('"+endpoint.name+"' AS ?EP) ('"+entre+"' AS ?EN)  { ?d a <"+Cla+">. } }";
+                        sparql_ += '}';
+                        var r = Meteor.call('doQueryCacheStats', {sparql: sparql_}).resultSet.value;
+                        var Obj = JSON.parse(r).results.bindings[0];
+                        Stats1.push({EP:Obj.EP.value, CL:Obj.EN.value, CO:Obj.C.value});
+                    }
                 }
-                //Statsc.insert({cod: 1, val: Stats1});
                 __mongo_stats.push({cod: 1, val: Stats1});
+                
+
                 var Stats__ = Stats1;
                 //console.log(Stats1);
                 //Numero recursos totales
@@ -849,17 +864,33 @@ Api.addRoute('sparql', {authRequired: false}, {
                 }
                 //Statsc.insert();
                 __mongo_stats.push({cod: 2, val: lsKW});
-                //Palabras clave
-                //Por tipo de documento
 
-                var sparql_td = "select ?t ?l ?y (count (*) as ?c) ('__' AS ?EP) { ?d a <http://purl.org/ontology/bibo/Document> . ?d a ?t . ?d <http://purl.org/dc/terms/language> ?l. ?d <http://purl.org/dc/terms/issued> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?y ). } group by ?t ?l ?y";
+
+
+                var sparql_td = "select ?t ?l ?y (count (*) as ?c) ('__' AS ?EP) { ?d a <http://purl.org/dc/terms/BibliographicResource> . ?d a ?t . ?d <http://purl.org/dc/terms/language> ?l. ?d <http://purl.org/dc/terms/issued> ?y2. bind( strbefore( ?y2, '-' ) as ?y3 ).  bind( strafter( ?y2, ' ' ) as ?y4 ). bind( if (str(?y3)='' && str(?y4)='',?y2,if(str(?y3)='',?y4,?y3)) as ?y ). } group by ?t ?l ?y";
                 sparql_ = 'select * {\n';
-                for (var i = 0; i < endp.length; i++) {
-                    var endpoint = endp[i];
+                
+                var endp2 = endp.slice(0);
+                endp2 = endp2.filter(function (a){
+                    var en=ConfigInfo.Repositories.filter (function (w){
+                        return w.Name==a.name;
+                    });
+                    var lsen=en[0].StatsResources.filter(function (s){
+                        return s=='BibliographicResource';
+                    });
+                    
+                    return lsen.length!=0;
+                });
+                
+                
+                
+                
+                for (var i = 0; i < endp2.length; i++) {
+                    var endpoint = endp2[i];
                     sparql_ += '{service <' + endpoint.endpoint + '> {' + '\n';
                     sparql_ += sparql_td.replace(new RegExp("__", "g"), endpoint.name) + '\n';
                     sparql_ += '}}' + '\n';
-                    if (i != endp.length - 1) {
+                    if (i != endp2.length - 1) {
                         sparql_ += 'union' + '\n';
                     }
                 }
@@ -868,26 +899,38 @@ Api.addRoute('sparql', {authRequired: false}, {
                 //console.log(sparql_);
                 Obj = JSON.parse(r).results.bindings;
                 Stats1 = [];
-                for (var i = 0; i < endp.length; i++) {
+                for (var i = 0; i < endp2.length; i++) {
                     var ls = Obj.filter(function (a) {
-                        return a.EP.value == endp[i].name;
+                        return a.EP.value == endp2[i].name;
                     });
-                    Stats1.push({EP: endp[i].name, val: ls});
+                    Stats1.push({EP: endp2[i].name, val: ls});
                 }
                 //Statsc.insert();
                 __mongo_stats.push({cod: 3, val: Stats1});
-        //Por tipo de documento
-        //
-        //Autores por tipo de contribucion
-                //sparql_td = "select ?p (count (*) as ?c) ('__' AS ?EP) {  select distinct ?a ?p {   ?a a <http://xmlns.com/foaf/0.1/Person> .   ?a ?p ?v.    ?v a <http://purl.org/ontology/bibo/Document>  } } group by ?p ";
-                sparql_td = "select ?p ?c ('__' AS ?EP) { {select (count(*) as ?c) (IRI('http://rdaregistry.info/Elements/a/P50161') as ?p) {  select distinct ?a {   ?a a <http://xmlns.com/foaf/0.1/Person> .   ?a <http://rdaregistry.info/Elements/a/P50161> [].  } }} union { select (count(*) as ?c) (IRI('http://rdaregistry.info/Elements/a/P50195') as ?p) {  select distinct ?a {   ?a a <http://xmlns.com/foaf/0.1/Person> .   ?a <http://rdaregistry.info/Elements/a/P50195> [].  } }} }";
+
+
+                sparql_td = "select ?p ?c ('__' AS ?EP) { 	{		select (count(*) as ?c) (IRI('http://rdaregistry.info/Elements/u/P60672') as ?p) {  			select distinct ?a {   			?a a <http://xmlns.com/foaf/0.1/Person> .   ?a <http://rdaregistry.info/Elements/u/P60672> [].  			} 			}	} union { 		select (count(*) as ?c) (IRI('http://rdaregistry.info/Elements/u/P60621') as ?p) {  			select distinct ?a {   			?a a <http://xmlns.com/foaf/0.1/Person> .   ?a <http://rdaregistry.info/Elements/u/P60621> [].  		} 	}	} union { 		select (count(*) as ?c) (IRI('http://rdaregistry.info/Elements/a/P50161') as ?p) {  			select distinct ?a {   			?a a <http://xmlns.com/foaf/0.1/Person> .   ?a <http://rdaregistry.info/Elements/a/P50161> [].  		} 	}	} union  {		select (count(*) as ?c) (IRI('http://rdaregistry.info/Elements/a/P50203') as ?p) {  			select distinct ?a {   		?a a <http://xmlns.com/oaf/0.1/Person> .   ?a <http://rdaregistry.info/Elements/a/P50203> [].  		} 	}	} union { select (count(*) as ?c) (IRI('http://xmlns.com/foaf/0.1/Person') as ?p) {     ?a a <http://xmlns.com/foaf/0.1/Person> .   }} }";
                 sparql_ = 'select * {\n';
-                for (var i = 0; i < endp.length; i++) {
-                    var endpoint = endp[i];
+                
+                endp2 = endp.slice(0);
+                endp2 = endp2.filter(function (a){
+                    var en=ConfigInfo.Repositories.filter (function (w){
+                        return w.Name==a.name;
+                    });
+                    var lsen=en[0].StatsResources.filter(function (s){
+                        return s=='Agent';
+                    });
+                    
+                    return lsen.length!=0;
+                });
+                
+                
+                for (var i = 0; i < endp2.length; i++) {
+                    var endpoint = endp2[i];
                     sparql_ += '{service <' + endpoint.endpoint + '> {' + '\n';
                     sparql_ += sparql_td.replace(new RegExp("__", "g"), endpoint.name) + '\n';
                     sparql_ += '}}' + '\n';
-                    if (i != endp.length - 1) {
+                    if (i != endp2.length - 1) {
                         sparql_ += 'union' + '\n';
                     }
                 }
@@ -896,28 +939,42 @@ Api.addRoute('sparql', {authRequired: false}, {
                 //console.log(sparql_);
                 Obj = JSON.parse(r).results.bindings;
                 Stats1 = [];
-                for (var i = 0; i < endp.length; i++) {
+                for (var i = 0; i < endp2.length; i++) {
                     var ls = Obj.filter(function (a) {
-                        return a.EP.value == endp[i].name;
+                        return a.EP.value == endp2[i].name;
                     });
-                    var TotDoc = Stats__.filter(function (a) {
-                        return a.EP.value == endp[i].name;
+                    var TotDoc = Obj.filter(function (a) {
+                        return a.EP.value == endp2[i].name && a.p.value=='http://xmlns.com/foaf/0.1/Person';
                     }) [0];
-                    Stats1.push({EP: endp[i].name, val: {total: Number(TotDoc.P.value), val: ls}});
+                    Stats1.push({EP: endp2[i].name, val: {total: Number(TotDoc.c.value), val: ls}});
                 }
                 //Statsc.insert();
                 __mongo_stats.push({cod: 4, val: Stats1});
-        //Autores por tipo de contribucion
-        //Top Autores
+
+
+
                 var topKA = 20;
-                sparql_td = "select ?a (max (?n) as ?name) (max (?coun) as ?counter) ('__' AS ?EP) {   ?a <http://xmlns.com/foaf/0.1/name> ?n.   {      select ?a (count(*) as ?coun)      {         { ?a <http://rdaregistry.info/Elements/a/P50195> [] }union{ ?a <http://rdaregistry.info/Elements/a/P50161> []}     } group by (?a) order by desc (?coun) limit " + topKA + "    } } group by (?a) order by desc(?co)";
+                sparql_td = "select ?a (max (?n) as ?name) (count (?coun ) as ?counter) ('__' AS ?EP) {   	?a a <http://xmlns.com/foaf/0.1/Person>. 	?a <http://xmlns.com/foaf/0.1/name> ?n. 	?a ?p ?coun  . } group by (?a)  order by desc(?counter) limit "+topKA;
                 sparql_ = 'select * {\n';
-                for (var i = 0; i < endp.length; i++) {
-                    var endpoint = endp[i];
+                
+                endp2 = endp.slice(0);
+                endp2 = endp2.filter(function (a){
+                    var en=ConfigInfo.Repositories.filter (function (w){
+                        return w.Name==a.name;
+                    });
+                    var lsen=en[0].StatsResources.filter(function (s){
+                        return s=='Agent';
+                    });
+                    
+                    return lsen.length!=0;
+                });
+                
+                for (var i = 0; i < endp2.length; i++) {
+                    var endpoint = endp2[i];
                     sparql_ += '{service <' + endpoint.endpoint + '> {' + '\n';
                     sparql_ += sparql_td.replace(new RegExp("__", "g"), endpoint.name) + '\n';
                     sparql_ += '}}' + '\n';
-                    if (i != endp.length - 1) {
+                    if (i != endp2.length - 1) {
                         sparql_ += 'union' + '\n';
                     }
                 }
@@ -927,12 +984,13 @@ Api.addRoute('sparql', {authRequired: false}, {
                 Stats1 = Obj;
                 //Statsc.insert();
                 __mongo_stats.push({cod: 5, val: Stats1});
-        //Top Autores
 
 
-        //Colecciones
+
+
+
                 var topKC = 20000;
-                sparql_td = "select ?c (max(?n) as ?name) (count(*) as ?counter) ('__' AS ?EP) {    ?c a <http://purl.org/ontology/bibo/Collection>.    ?c <http://purl.org/dc/terms/description> ?n.   ?d <http://purl.org/dc/terms/isPartOf> ?c. } group by ?c order by desc (?co) limit " + topKC;
+                sparql_td = "select ?c (max(?n) as ?name) (count(*) as ?counter) ('__' AS ?EP) {    {{?c a <http://purl.org/ontology/bibo/Collection>.} union { ?c a <http://purl.org/dc/dcmitype/Collection>.}}.    ?c <http://www.w3.org/2000/01/rdf-schema#label> ?n.   ?d <http://purl.org/dc/terms/isPartOf> ?c. } group by ?c order by desc (?co) limit " + topKC;
                 sparql_ = 'select * {\n';
                 for (var i = 0; i < endp.length; i++) {
                     var endpoint = endp[i];
@@ -955,28 +1013,11 @@ Api.addRoute('sparql', {authRequired: false}, {
                         }
                         Obj[i].name.value = Obj[i].name.value.replace(new RegExp(StopWords2[j], "g"), '');
                     }
-                    //Obj[i].name.value = Obj[i].name.value.toLowerCase();
                 }
-
-                /*
-                 var result = [];
-                 Obj.reduce(function (res, value) {
-                 if (!res[value.name.value]) {
-                 res[value.name.value] = {
-                 counter: 0,
-                 name: value.name.value,
-                 c: value.c.value,
-                 EP: value.EP.value
-                 };
-                 result.push(res[value.name.value])
-                 }
-                 res[value.name.value].qty += Number(value.counter.value);
-                 return res;
-                 }, {});
-                 */
                 Stats1 = Obj;
                 __mongo_stats.push({cod: 6, val: Stats1});
-        //Colecciones
+
+
 
 
 
@@ -984,6 +1025,8 @@ Api.addRoute('sparql', {authRequired: false}, {
                 for (var i = 0; i < __mongo_stats.length; i++) {
                     Statsc.insert(__mongo_stats[i]);
                 }
+
+
 
 
 
@@ -1133,89 +1176,7 @@ Api.addRoute('sparql', {authRequired: false}, {
                             console.log("==Avoiding SPARQL validation on client");
                         }
                         var j = a.sparql.trim().hashCode();
-                        //console.log(j);
-                        //Get profile
-                        /*
-                        var usr = Profile.findOne({idProfile: this.userId});
-                        var appPri = false;
-                        var pon = 1;
-                        var idi = null;
-                        var lsareint = [];
-                        var lsareintP = [];
-                        //console.log(usr);
-
-                        var englsar = {"FoS_0": "Art",
-                            "FoS_1": "Biology",
-                            "FoS_2": "Business",
-                            "FoS_3": "Chemistry",
-                            "FoS_4": "Computer science",
-                            "FoS_5": "Economics",
-                            "FoS_6": "Engineering",
-                            "FoS_7": "Environmental science",
-                            "FoS_8": "Geography",
-                            "FoS_9": "Geology",
-                            "FoS_10": "History",
-                            "FoS_11": "Materials science",
-                            "FoS_12": "Mathematics",
-                            "FoS_13": "Medicine",
-                            "FoS_14": "Philosophy",
-                            "FoS_15": "Physics",
-                            "FoS_16": "Political science",
-                            "FoS_17": "Psychology",
-                            "FoS_18": "Sociology"};
-                        var esplsar = {"FoS_0": "Arte",
-                            "FoS_1": "Biología",
-                            "FoS_2": "Negocios",
-                            "FoS_3": "Química",
-                            "FoS_4": "Ciencias de la computación",
-                            "FoS_5": "Economía",
-                            "FoS_6": "Ingeniería",
-                            "FoS_7": "Ciencias medioambientales",
-                            "FoS_8": "Geografía",
-                            "FoS_9": "Geología",
-                            "FoS_10": "Historia",
-                            "FoS_11": "Ciencias de los materiales",
-                            "FoS_12": "Matemáticas",
-                            "FoS_13": "Medicina",
-                            "FoS_14": "Filosofía",
-                            "FoS_15": "Física",
-                            "FoS_16": "Ciencias políticas",
-                            "FoS_17": "Psicología",
-                            "FoS_18": "Sociología"};
-                        // console.log(this.userId);
-                        if (usr) {
-                            //   console.log(usr);
-
-                            appPri = true;
-                            if (usr.levelAcademic == 1) {
-                                pon = 2;
-                            }
-                            if (usr.levelAcademic == 2) {
-                                pon = 3;
-                            }
-                            if (usr.areasInterest != undefined && Array.isArray(usr.areasInterest)) {
-                                lsareint = usr.areasInterest;
-                            }
-
-                            var lsnn = [];
-                            for (var ik = 0; ik < 19; ik++) {
-                                lsareintP.push(englsar['FoS_' + ik]);
-                            }
-                            for (var ik = 0; ik < 19; ik++) {
-                                lsareintP.push(esplsar['FoS_' + ik]);
-                            }
-                            lsnn = lsareintP;
-                            for (var n = 0; n < lsnn.length; n++) {
-                                lsnn[n] = lsnn[n].removeDiacritics().keyword().trim().toLowerCase().split(" ").unique().filter(function (d) {
-                                    return d !== "";
-                                });
-                            }
-                            lsareintP = lsnn;
-                            idi = usr.language;
-                        }
-                        */
-                        //
-                        //
+                        
                         ///Faceted
                         if (FacSe.length != 0) {
                             var kFaceted = Cache.findOne({key: j});
@@ -1240,13 +1201,9 @@ Api.addRoute('sparql', {authRequired: false}, {
                                     all.push(all_);
                                 }
                                 all.push({key: j});
-                                //console.log(JSON.stringify({$and : all }));
                                 var k = null;
-                             //   if (!appPri) {
+
                                     k = Cache.find({$and: all}, {sort: {nresult: 1, firstResult: -1}}).fetch();
-                              ///  } else {
-                               //     k = Prio(j, {$and: all}, {sort: {nresult: 1, firstResult: -1}}, pon, idi, e, f, false, lsareint);
-                              //  }
 
                                 var k2 = Cache.find({key: j, original: true}, {limit: 1, skip: 0}).fetch();
                                 var y = {};
@@ -1361,7 +1318,6 @@ Api.addRoute('sparql', {authRequired: false}, {
                         }
                         //Faceted
                         var k = null;
-                      //  if (!appPri) {
                             k = Cache.find({
                                 key: j,
                                 nresult: {
@@ -1373,10 +1329,7 @@ Api.addRoute('sparql', {authRequired: false}, {
                                     nresult: +1
                                 }
                             }).fetch();
-                     //   } else {
-                      //      k = Prio(j, {key: j}, null, pon, idi, e, f, true, lsareint);
-                      //  }
-                        /////
+
                         var l = "";
                         var cacheo = false;
                         if (0 == k.length) {
@@ -1402,13 +1355,8 @@ Api.addRoute('sparql', {authRequired: false}, {
                             var s = 0;
                             var timi = 0.0;
                             var bulk = [];
-                            //TickTock(true);
                             for (var t = 0; t < q; t++) {
                                 var un = false;
-                                //if (m.results.bindings[t]["" + d] == undefined){
-                                   // console.log(m.results.bindings[t]);
-                                    
-                                //}
                                 
                                 var v = m.results.bindings[t]["" + d].value;
                                 if (r["" + v] != undefined) {
@@ -1424,49 +1372,20 @@ Api.addRoute('sparql', {authRequired: false}, {
                                 var fEndpoint = null;
                                 var fLang = null;
                                 var fYear = null;
-                                //var fScore = 0.0;
-                                //var fSub = null;
-                               // if (m.results.bindings[t].Score != undefined) {
-                                //    fScore = Number(m.results.bindings[t].Score.value);
-                              //  }
-                                
-                               // if (m.results.bindings[t].Sub != undefined && m.results.bindings[t].Sub != null) {
-                              //      fSub=m.results.bindings[t].Sub.value;
-                              //  }
-                                   
 
-                                // if (r_Type["" + v]!= undefined){
-                                //   fType=r_Type["" + v];
-                                //}else{
                                 if (m.results.bindings[t].Type != undefined) {
                                     fType = m.results.bindings[t].Type.value;
                                 }
-                                //  r_Type["" + v]=fType;
-                                // }
-                                // if (r_Endpoint["" + v] != undefined){
-                                //   fEndpoint = r_Endpoint["" + v];
-                                // } else{
+
                                 if (m.results.bindings[t].Endpoint != undefined) {
                                     fEndpoint = m.results.bindings[t].Endpoint.value;
                                 }
-                                //   r_Endpoint["" + v] = fEndpoint;
-                                // }
-                                //  if (r_Lang["" + v] != undefined){
-                                //    fLang = r_Lang["" + v];
-                                //} else{
                                 if (m.results.bindings[t].Lang != undefined) {
                                     fLang = m.results.bindings[t].Lang.value;
                                 }
-                                //   r_Lang["" + v] = fLang;
-                                // }
-                                // if (r_Year["" + v] != undefined){
-                                //    fYear = r_Year["" + v];
-                                // } else{
                                 if (m.results.bindings[t].Year != undefined) {
                                     fYear = m.results.bindings[t].Year.value;
                                 }
-                                //    r_Year["" + v] = fYear;
-                                // }
 
 
 
@@ -1493,25 +1412,12 @@ Api.addRoute('sparql', {authRequired: false}, {
                                     value: JSON.parse(JSON.stringify(JSONOut2)),
                                     ttl_date: new Date(),
                                     nresult: r["" + v],
-                                   // score: Number(fScore),
                                     uri: v,
-                                   // sub: fSub,
                                     faceted: [{key: 'Year', value: Number(fYear) == 0 || isNaN(Number(fYear)) ? null : Number(fYear)}, {key: 'Endpoint', value: fEndpoint}, {key: 'Lang', value: fLang}, {key: 'Type', value: fType}],
                                     firstResult: un,
                                     original: orgi
                                 });
-                                /*Cache.insert({
-                                 key: j,
-                                 value: JSONOut2,
-                                 ttl_date: new Date(),
-                                 nresult: r["" + v],
-                                 score:Number(fScore),
-                                 uri:v,
-                                 sub:fSub,
-                                 faceted: [{key:'Year', value:Number(fYear) == 0 ? null:Number(fYear)  },{key:'Endpoint', value:fEndpoint},{key:'Lang', value:fLang},{key:'Type', value:fType}] ,
-                                 firstResult:un,
-                                 original: orgi
-                                 });*/
+                                
 
                                 l.content = back;
                             }
@@ -1525,7 +1431,7 @@ Api.addRoute('sparql', {authRequired: false}, {
                             r = {};
                             r_Sub = {};
                             m = {};
-                            l = {};
+                           // l = {};
                             bulk = [];
                           //  if (!appPri) {
                                 k = Cache.find({
@@ -1539,9 +1445,6 @@ Api.addRoute('sparql', {authRequired: false}, {
                                         nresult: +1
                                     }
                                 }).fetch();
-                          //  } else {
-                         //       k = Prio(j, {key: j}, null, pon, idi, e, f, true, lsareint);
-                         //   }
 
                             //////
                             if (0 == q) {
@@ -1862,7 +1765,7 @@ Api.addRoute('sparql', {authRequired: false}, {
                 if (text == null || lsend != null && lsend.length == 0) {
                     return {data: [], cacheable: true};
                 }
-                var text2 = text.removeDiacritics().keyword().trim().toLowerCase().replace(/[\.\+\/\\\|\*`\~,!@\#$%:^&\(\)\[\]\{\}\?\<\>\;=\'\"´-]+/g, " ");
+                var text2 = text.removeDiacritics().keyword().trim().toLowerCase().replace(/[\.\+\/\\\|\*`\~,!@\#$%:^&\(\)\[\]\{\}\?\<\>\;=\'\"´-]+/g, " ").trim();
                 if (text2 === "") {
                     return {data: [], cacheable: true};
                 }
@@ -1916,7 +1819,7 @@ Api.addRoute('sparql', {authRequired: false}, {
                             }
 
                         }
-                        Meteor._sleepForMs(500);
+                        Meteor._sleepForMs(1000);
                     }
 
                 }
@@ -2379,6 +2282,7 @@ Api.addRoute('sparql', {authRequired: false}, {
                 //   console.log ("Validado");
                 //    console.log (isValid);
                 // check({admin: true}, mySchema);
+
                 var certified = true;
                  if ( access > 0  ) {
                     if (validar (1)){
@@ -2390,7 +2294,6 @@ Api.addRoute('sparql', {authRequired: false}, {
                  } else {
                     var certified = true; 
                  }
-                
 
                 if (this.userId == id && isValid && certified ) {
                     if (!_.isUndefined(profile)) {
@@ -2508,7 +2411,11 @@ Api.addRoute('sparql', {authRequired: false}, {
 
                  return "Error";
 
-              }
+              }, ConfigInfo: function (){
+                   var myjson = {};
+                    myjson = JSON.parse(Assets.getText("config.json"));
+                    return myjson;
+                }
               
  
  
