@@ -45,8 +45,8 @@
        <div class="col-md-12" style="text-align: left; margin-top: -10px;margin-bottom: -5px;"> 
         <div class="cc-selector"> 
         {{#each resourcesavailable}}
-        <input id="{{Tipo}}" type="radio" name="opciones" value="{{Tipo}}"  />
-        <label style="background-image:url('{{Imagen}}');width: 35px;height: 35px;" tipo= "{{Tipo}}" class="opciones-cc {{Tipo}}" select="0" onclick="updatebuttons2('{{Tipo}}')" for="{{Imagen}}" data-toggle="tooltip" title="{{Description}}"></label>
+        <input id="{{Name}}" type="radio" name="opciones" value="{{Name}}"  />
+        <label style="background-image:url('{{Imagen}}');width: 35px;height: 35px;" tipo= "{{Name}}" class="opciones-cc {{Name}}" select="0" onclick="updatebuttons2('{{Name}}')" for="{{Imagen}}" data-toggle="tooltip" title="{{Description}}"></label>
         {{/each}}
         </div> 
         </div>
@@ -84,9 +84,10 @@
 
 		<div class="second-area">
 	    <div class="row">
-
 			<div class="sugestion-area col-md-3"> 
-				    <div class="sugestion-panel" id = "related">
+                            
+                            
+                            <div class="sugestion-panel" id = "related">
 					<span id="Title-suggestion" > <b> Recursos Relacionados  </b>  </span>
 					<span class = "{{DespRel}}" id= "expandrel"  onclick = "desplegar3 (this)"  > </span>
 					<div class="result-suggestion collapse" id = "rel">
@@ -261,7 +262,8 @@ el proceso en la publicación de LOD. </p>
 
 		<div class="result col-md-9">
 			<div class="fuente-area col-md-14 text-center"> 
-			<span class="{{Icon}}"></span>
+			<!--<span class="{{Icon}}"></span>-->
+                        <img src="{{Icon}}" width=20px >
 			{{Origin}}
 			 <a href="#" title="QR Code" class="qricon" datauri ="{{URI}}"  onclick="qrmodalshow('{{URI}}','{{Origin}}','{{Icon}}');"   ><img src="/images/qr.png" width=14px ></a> 
 			 <span id="dwnload" class="glyphicon glyphicon-save" onclick="download('{{URI}}')"> </span>
@@ -355,7 +357,7 @@ el proceso en la publicación de LOD. </p>
     </div>
   </div>
 
-   <div class="modal   fade" id="myrelateditemsmodal" role="dialog">
+<div class="modal   fade" id="myrelateditemsmodal" role="dialog">
     <div class="modal-dialog modal-sm">
       <div class="modal-content ">
         <div class="modal-header modal-show">
@@ -385,8 +387,6 @@ el proceso en la publicación de LOD. </p>
       </div>
     </div>
   </div>
-
-
 
 
  <div class="modal   fade" id="mydwmodal" role="dialog">

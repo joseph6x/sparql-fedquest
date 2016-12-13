@@ -123,9 +123,9 @@ function loadProfile (){
     });
       // return result;
     };
-
-
-    Template.profile.helpers({
+    
+    
+     Template.profile.helpers({
    access_level: function() {
   if (!_.isNull(Meteor.user())&& !_.isUndefined(Meteor.user())) {
           var valaccess = Meteor.user().profile.access;

@@ -42,17 +42,9 @@ this.IndexView = Backbone.View.extend({
                 }
 
                 var t__ = "T";
-                var EntitySearch = $('input:radio[name=opciones]:checked').val();
-                switch (EntitySearch) {
-                    case 'autores':
-                        t__ = "P";
-                        break;
-                    case 'documentos':
-                        t__ = "D";
-                        break;
-                    case 'colecciones':
-                        t__ = "C";
-                        break;
+                var EntitySearch = $('label[select="1"]').attr('tipo');
+                if (EntitySearch != undefined) {
+                    t__=EntitySearch;
                 }
                 if (term != null && term.trim().length > 3) {
                     
