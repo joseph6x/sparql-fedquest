@@ -726,19 +726,26 @@ ValidateSuggestionQuery = function (query) {
 actAHyper = function (e) {
     var ConfigInfo = Session.get('ConfigInfo');
 
-        var EntitySearch2 = get_radio_value("opciones");
-        var EntitySearch='T';
-            switch (EntitySearch2) {
-                    case 'autores':
-                        EntitySearch = "Agent";
-                        break;
-                    case 'documentos':
-                        EntitySearch = "BibliographicResource";
-                        break;
-                    case 'colecciones':
-                        EntitySearch = "Collection";
-                        break;
+
+                var t__ = "T";
+                var EntitySearch = $('label[select="1"]').attr('tipo');
+                if (EntitySearch != undefined) {
+                    t__=EntitySearch;
                 }
+
+       /// var EntitySearch2 = get_radio_value("opciones");
+        var EntitySearch=t__;
+      //      switch (EntitySearch2) {
+          //          case 'autores':
+       //                 EntitySearch = "Agent";
+         ///               break;
+          //          case 'documentos':
+         //               EntitySearch = "BibliographicResource";
+          //              break;
+           //         case 'colecciones':
+           //             EntitySearch = "Collection";
+           //             break;
+           //     }
         
         var cl=ConfigInfo.MainClasses.filter(function (a){
             return a.Name==EntitySearch;
