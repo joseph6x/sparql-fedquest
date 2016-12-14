@@ -2011,7 +2011,26 @@ if (Meteor.isClient) {
                 return "glyphicon glyphicon-chevron-down";
             }
 
-        }, DespFac: function () {
+        }, LinksInfo: function (){
+            var r= Session.get('LinksInfo');
+            var URI= Session.get('LinksURI');
+            var OrgEP= Session.get('LinksEP');
+            var ob=[];
+            if (r!=undefined && URI!=undefined && OrgEP!=undefined && r!=null && URI!=null && OrgEP!=null){
+                
+                
+                for (var i=0; i<r.length; i++){
+                    if (Number (r[i].CO.value)>0){
+                        ob.push({EP:r[i].EP.value , MX:Number (r[i].CO.value), IN: i+1 });
+                    }
+                }
+            }
+            
+            return ob;
+        },
+        
+        
+        DespFac: function () {
             var des = Session.get("DespFac");
             if (des) {
 

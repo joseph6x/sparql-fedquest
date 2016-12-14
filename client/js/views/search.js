@@ -880,9 +880,53 @@ function selec2(prev, val) {
     Session.set('auxAct', Session.get('auxAct') + 1);
     return prev;
 }
-showrel = function (URI, label)
+showrel = function (URI, label, OrgEP)
 {
- //desplegar3();
+    var ConfigInfo= Session.get ('ConfigInfo');
+    
+    var sprql="select ?EP ( count (*) as ?CO) {   <" + URI + "> <http://www.w3.org/2000/01/rdf-schema#seeAlso> ?b . {\n";
+    
+    for (var i = 0; i < ConfigInfo.Repositories.length; i++) {
+        var ep = Endpoints.find({name: ConfigInfo.Repositories[i].Name}).fetch()[0];
+        sprql += "{service <" + ep.endpoint + "> { select  ('" + ConfigInfo.Repositories[i].Name + "' as ?EP) ?b { \n";
+
+        for (var j = 0; j < ConfigInfo.Repositories[i].ClassesSearch.length; j++) {
+            var cls = ConfigInfo.MainClasses.filter(function (a) {
+                return a.Name == ConfigInfo.Repositories[i].ClassesSearch[j];
+            });
+            cls = cls[0];
+
+            sprql += "{ ?b a <"+cls.URI+"> . }\n";
+            if (j != ConfigInfo.Repositories[i].ClassesSearch.length - 1) {
+                sprql += " union ";
+            }
+
+        }
+        sprql += "}} }\n";
+        if (i != ConfigInfo.Repositories.length - 1) {
+            sprql += " union ";
+        }
+    }
+    
+    sprql+='}} group by ?EP';
+
+    //alert(sprql);
+    var en = Endpoints.find({name: OrgEP}).fetch()[0];
+    var v2 = en.endpoint;
+    var v3 = en.graphURI;
+    // var redirectWindow = window.open('', '_blank');
+    Meteor.call('runQuery', v2, v3, sprql , function (error, result) {
+        if (result) {
+            var r = JSON.parse(result.content).results.bindings;
+            Session.set('LinksInfo', r);
+            Session.set('LinksURI', URI);
+            Session.set('LinksEP', OrgEP);
+            
+        }
+    });
+    
+    
+
  //$("#rel").collapse('show'); 
  $('.relatedbase').html("<b>Base:</b><br>"+label+"(<a target=_blank href="+URI+">"+URI+"</a>)"); 
  if (!Session.get('DespRel')) { 
@@ -1110,15 +1154,17 @@ desplegar2 = function (e) {
     }
     //alert ("Desplegar");
 }
-   sliderfun = function (e ,n){
+   sliderfun = function (e ,n, c){
     console.log(e);
     $( "#"+e ).slider({
-     max: 50 ,
-     min: 1 , 
-     value: 50 ,
+     max: c ,
+     min: 0 , 
+     value: c ,
      stop: function( event, ui ) { console.log (ui);console.log (ui.value); $("#amount"+n).text('('+ui.value+')'); console.log (event);}
 
     });    
+
+    $("#amount"+n).text('('+c+')');
 
    }
 
@@ -1135,9 +1181,112 @@ desplegar2 = function (e) {
 
    runres = function () {
 
-   console.log ("RUN");
-   var optionTexts = [];
-   $("#sortable li").each(function() { optionTexts.push($(this).attr('Num')) });
-   console.log (optionTexts);
+    var con =[];
+   $("#sortable li").each(function() { 
+       var n = $(this).attr('Num');
+       var ep = $(this).attr('EP');
+       var num= $( "#slider-related"+n ).slider('values', 0)
+       con.push({EP:ep, N: num});
+   });
+   
+   
+    var URI= Session.get('LinksURI');
+    var OrgEP= Session.get('LinksEP');
+   
+   var enpo = Endpoints.find({name: OrgEP}).fetch()[0];
+   
+   var ConfigInfo= Session.get ('ConfigInfo');
+    
+    var sprql="select * { service <"+enpo.endpoint+"> { select * {\n";
+    
+    for (var i=0; i<ConfigInfo.Repositories.length; i++ ){
+        var ep=Endpoints.find({name: ConfigInfo.Repositories[i].Name}).fetch()[0];
+        var n= con.filter(function (a){
+           return a.EP==ConfigInfo.Repositories[i].Name; 
+            
+        });
+        if (n.length != 0){
+            n=n[0].N;
+        }else{
+            n=0;
+        }
+        
+        
+        
+        sprql+="{ {select ?EntityURI { <"+URI+"> <http://www.w3.org/2000/01/rdf-schema#seeAlso> ?EntityURI.  {service <"+ep.endpoint+"> {select  distinct ?EntityURI { ?EntityURI a [] }} }. } limit "+n+" }.   service <"+ep.endpoint+"> { select ('"+ep.name+"' AS ?Endpoint) ?EntityURI ?Score ?EntityClass  ?EntityLabel  ?PropertyValue ?Property ?PropertyLabel ?Lang ?Type ?Year {\n";
+        
+        sprql+="{\n";
+        sprql+="select distinct ?EntityURI ?Score {  ?EntityURI a []. bind(1 as ?Score). }  \n";
+        sprql+="}.\n";
+       
+        sprql+="{\n";
+            for (var j=0; j<ConfigInfo.Repositories[i].ClassesSearch.length; j++ ){
+                var cls=ConfigInfo.MainClasses.filter(function (a){
+                    return a.Name == ConfigInfo.Repositories[i].ClassesSearch[j];
+                }); 
+                cls=cls[0];
+                
+                cls.indexPropertiesName=cls.indexProperties.map(function (a){
+                        
+                        return a.split("").reverse().join("").split(/\/|#/)[0].split("").reverse().join("");;
+                        
+                    });
+                
+                
+                sprql+="{\n";
+                sprql+="select * {\n";
+                
+                sprql+="?EntityURI a <"+cls.URI+">.\n";
+                sprql+="bind (IRI (<"+cls.URI+">) as ?EntityClass) .\n";
+                sprql+="?EntityURI <"+cls.labelProperty+"> ?EntityLabel .\n";
+                
+                sprql+= cls.LangQuery+"\n";
+                sprql+= cls.YearQuery+"\n";
+                sprql+= cls.TypeQuery+"\n";
+                
+                
+                
+                for (var k=0; k<cls.indexProperties.length; k++ ){
+                    sprql+="{\n";
+                    
+                    sprql+="?EntityURI <"+cls.indexProperties[k]+"> ?PropertyValue .";
+                    sprql+="bind ( IRI(<"+cls.indexProperties[k]+">) as ?Property ) .";
+                    sprql+="bind ( '"+cls.indexPropertiesName[k]+"' as ?PropertyLabel ) .";
+                    
+                    
+                    sprql+="}\n";
+                    if (k!=cls.indexProperties.length-1 ){
+                        sprql+=" union ";
+                    }
+                    
+                }
+                
+                sprql+="}\n";
+                sprql+="}\n";
+                
+                if (j!=ConfigInfo.Repositories[i].ClassesSearch.length-1 ){
+                    sprql+=" union ";
+                }
+                
+                
+            }
+        sprql+="}.\n";
+            
+        sprql+="}}}\n";    
+        
+        if ( i!=ConfigInfo.Repositories.length-1){
+                    sprql+=" union ";
+        }
+        
+    }
+    
+    sprql+='}}}';
+    
+    console.log(sprql);
+   
+   var jsonRequest = {"sparql": sprql, "validateQuery": false, "MainVar": "EntityURI", "ApplyFilter": false};
+
+            Session.set('jsonRequest', jsonRequest);
+            App.SearchRun(0, 1);   
    }
 //$( "#slider-related" ).slider();
