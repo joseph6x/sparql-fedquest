@@ -14,14 +14,14 @@ var d3tip = require('d3-tip')(d3);
     me = this;
    // v1 =  "http://localhost:8080/biblioguias/libguide/159504";
    // v1= "http://localhost:8080/cepalstat/indicador/Indicador_2299";
-    v1 = "http://localhost:8080/repositorio/document/10001";
+ //   v1 = "http://localhost:8080/repositorio/document/17705";
    
    // v2 =  "http://localhost:8891/biblioguias/sparql";
    // v2 = "http://localhost:8891/cepalstat/sparql";
-    v2 = "http://localhost:8891/repositorio/sparql";
+  //  v2 = "http://localhost:8891/repositorio/sparql";
     
   //  v3 =  "http://localhost:8080/biblioguias/";
-    v3 = "http://localhost:8080/repositorio/";
+  //  v3 = "http://localhost:8080/repositorio/";
   //  v3 = "http://localhost:8080/cepalstat/";
 
     //http://localhost:8080/biblioguias/person/MIRIAN_RAMIREZ
@@ -54,6 +54,7 @@ var d3tip = require('d3-tip')(d3);
     img['http://purl.org/linked-data/cube#ComponentSpecification'] = "/iconos/compiconc.png";
     img['http://www.w3.org/2002/07/owl#Thing'] = "/iconos/resiconC.png";
     img['http://purl.org/ontology/bibo/Collection'] = "/images/collection.png";
+     img['unknow'] = "/images/documento.png";
 
     Session.set('img', img);
 
@@ -82,7 +83,7 @@ var d3tip = require('d3-tip')(d3);
     restitle['http://www.w3.org/2002/07/owl#Thing'] = "http://www.w3.org/2000/01/rdf-schema#label";
     restitle['http://purl.org/ontology/bibo/Collection'] = "http://www.w3.org/2000/01/rdf-schema#label";
     restitle['http://vivoweb.org/ontology/core#hasSubjectArea'] =  "http://www.w3.org/2000/01/rdf-schema#label";
-   
+    restitle['unknow'] = "Title";
     
 
 
@@ -816,10 +817,12 @@ var d3tip = require('d3-tip')(d3);
                                     t = title;
                                   }
                      //      console.log ("3");
-                          
+                                   console.log ("Entrando Title");
+                                   console.log (d);
                                    var restitle = {};
                                 if (t.length>1){
                                    console.log ("sI"+t+t.length);
+
                                   if (typeof d[d.tipo]['data'][t] === "undefined" ){
                                    restitle['@value'] =  relativeURI(d.tipo);
                                    }else {
@@ -835,8 +838,9 @@ var d3tip = require('d3-tip')(d3);
                                    if (Array.isArray(restitle)) {
                                        restitle = restitle[0];
                                       } 
-                                       restitle = restitle['@value'];
+                                       restitle = restitle['@value']; 
                                    console.log ("3");
+                                   console.log (restitle);
                               if (restitle.length > 40){
                                  restitle  = restitle.substring (0,40)+ '...';
 
@@ -1333,15 +1337,23 @@ var d3tip = require('d3-tip')(d3);
               //exclusion = exceptions+' && ';
             }
 
+
+                  var sparql =  'Construct {  <'+idbase+'> ?b ?c . <'+idbase+'> a ?z . <'+idbase+'> ?n ?m '+
+                    '. ?c ?a ?x . ?c a ?y } where { <'+idbase+'> ?b ?c  . <'+idbase+'> a ?z .   <'+idbase+'> ?n ?m .' +
+                   '?c ?a ?x .  ?c a ?y . FILTER  ( '+exclusion+' )} ';
+
+
 /*
                     var sparql =  'Construct {  <'+idbase+'> ?b ?c . <'+idbase+'> a ?z . <'+idbase+'> ?n ?m '+
                     '. ?c ?a ?x . ?c a ?y } where { <'+idbase+'> ?b ?c  . <'+idbase+'> a ?z .   <'+idbase+'> ?n ?m .' +
                    '?c ?a ?x .  ?c a ?y . FILTER  ( '+exclusion+' &&  isLiteral (?m) && isIRI (?c) )} limit 1000';
 */
+/*
+                    var sparql =  'Construct {  <'+idbase+'> ?b ?c . <'+idbase+'> a ?z . <'+idbase+'> ?n ?m .  <'+idbase+'> ?u ?l . ?l a ?v'+
+                    '. ?c ?a ?x . ?c a ?y } where { <'+idbase+'> ?b ?c  . <'+idbase+'> a ?z .   <'+idbase+'> ?n ?m .  <'+idbase+'> ?u ?l . ?l a ?v' +
+                   '. ?c ?a ?x .  ?c a ?y . FILTER  ( '+exclusion+' && isLiteral(?m) && isLiteral (?x) )} ';
+*/
 
-                    var sparql =  'Construct {  <'+idbase+'> ?b ?c . <'+idbase+'> a ?z . <'+idbase+'> ?n ?m '+
-                    '. ?c ?a ?x . ?c a ?y } where { <'+idbase+'> ?b ?c  . <'+idbase+'> a ?z .   <'+idbase+'> ?n ?m .' +
-                   '?c ?a ?x .  ?c a ?y . FILTER  ( '+exclusion+' )} ';
 
                    /*   var sparql =  'Construct {  <'+idbase+'> ?b ?c . <'+idbase+'> a ?z . <'+idbase+'> ?n ?m '+
                     '. ?c ?a ?x . ?c a ?y } where { <'+idbase+'> ?b ?c  . <'+idbase+'> a ?z .   <'+idbase+'> ?n ?m .' +
@@ -1621,8 +1633,8 @@ var d3tip = require('d3-tip')(d3);
                                             var tipo = objson['@type'];
                                              
                                             if (Array.isArray(tipo)){
-
-                                              if ( node['tipo']!= undefined){
+                                             console.log ("Es array"); 
+                                              if ( node['tipo']!= undefined && node['tipo']!= 'unknow'){
 
                                               for (var i = 0 ; i < tipo.length ;i++) {
                                                 
@@ -1631,14 +1643,28 @@ var d3tip = require('d3-tip')(d3);
                                                 break;
                                                 }
                                               }
-                                              }
+
+
+                                              } else {  
+                                                 console.log ("No tiene TIPO");    
+                                                tipo = tipo[0];  }
                                             }
 
                                             console.log (tipo);
                               console.log ("NODO TIPO");  
                               console.log (node);
-                                    node[tipo]['data']= objson;
-                                    node['tipo']=tipo; 
+                                     
+                              
+                                 if ( typeof node[tipo] === 'undefined') {
+                                   node[tipo] = {'data':objson , 'tipo': tipo};
+                                    node['tipo']=tipo;
+                                   delete node['unknow'];
+
+                                 }else {
+                                  node[tipo]['data']= objson;
+                                    node['tipo']=tipo;
+                                 }
+                                   console.log (node);
 /*
                               if ( objson["@type"] == "foaf:Person" ){
                                  node['author']['data'] =  objson;
@@ -1656,20 +1682,20 @@ var d3tip = require('d3-tip')(d3);
                               }
 */
                              
-                           if (objson.hasOwnProperty ("owl:sameAs"))
+                           if (objson.hasOwnProperty ("http://www.w3.org/2000/01/rdf-schema#seeAlso"))
                            {  
                              console.log("Si sameAs");
                               var objsame = [] ;
-                           if (  Array.isArray(objson["owl:sameAs"]) ) {
+                           if (  Array.isArray(objson["http://www.w3.org/2000/01/rdf-schema#seeAlso"]) ) {
                                //   console.log ("Si Objeto");
                                  //  objsame[0] = objson["owl:sameAs"]["@id"];
-                                  objsame = objson["owl:sameAs"] ;
+                                  objsame = objson["http://www.w3.org/2000/01/rdf-schema#seeAlso"] ;
                                   console.log ("Varios");
 
 
                            } else 
                                {
-                                  objsame[0] = objson["owl:sameAs"];
+                                  objsame[0] = objson["http://www.w3.org/2000/01/rdf-schema#seeAlso"];
                                   console.log ("Solo uno");
                              //  objsame = objson ;
                                }
@@ -1685,11 +1711,13 @@ var d3tip = require('d3-tip')(d3);
 
                             console.log ("Obj1");
                             console.log (objsame[j]);*/
-
+                             console.log ("Nuevo See also");
+                             console.log (objsame);
                             console.log (relations[objsame[j]["@id"]]);
                            // var typeRelation["Relation"] = "SameAs";
                            child ['@id'] =  objsame[j]["@id"]; 
-                           child ["author"] = {'@id' : objsame[j]["@id"] , 'data' : { 'Relation': "SameAs" } , children : [] , 'relation': relations[objsame[j]["@id"]] };
+                           child ["unknow"] = {'@id' : objsame[j]["@id"] , 'data' : { 'Title': {"@value":"SeeAlso" } } , children : [] , 'relation': relations[objsame[j]["@id"]] };
+                          child ['tipo'] = "unknow";
                            node.children.push(child);
                           
                           // exploredArtistIds.push(objsame[j]["@id"]);

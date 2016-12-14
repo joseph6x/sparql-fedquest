@@ -1141,3 +1141,13 @@ desplegar2 = function (e) {
    console.log (optionTexts);
    }
 //$( "#slider-related" ).slider();
+
+Template.search.helpers({
+    relatedresavailable: function() {
+       var end =  Endpoints.find({status: 'A'}).fetch();
+      
+       console.log (end);
+       return end;
+    } 
+  
+});
