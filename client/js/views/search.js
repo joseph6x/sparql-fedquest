@@ -1198,8 +1198,22 @@ desplegar2 = function (e) {
    var ConfigInfo= Session.get ('ConfigInfo');
     
     var sprql="select * { service <"+enpo.endpoint+"> { select * {\n";
-    
-    for (var i=0; i<ConfigInfo.Repositories.length; i++ ){
+
+
+    var mm=-1;
+
+    for (var ii=0; ii<con.length; ii++ ){
+        var i=-1;
+        for (var jj=0; jj<ConfigInfo.Repositories.length ; jj++){
+            i=jj;
+            if (ConfigInfo.Repositories[jj].Name== con[ii].EP)
+            {
+                break;
+            }
+        }
+        
+        
+        //ConfigInfo.Repositories.
         var ep=Endpoints.find({name: ConfigInfo.Repositories[i].Name}).fetch()[0];
         var n= con.filter(function (a){
            return a.EP==ConfigInfo.Repositories[i].Name; 
@@ -1211,9 +1225,13 @@ desplegar2 = function (e) {
             n=0;
         }
         
+        if (n==0){
+            continue;
+        }
+        mm++;
         
         
-        sprql+="{ {select ?EntityURI { <"+URI+"> <http://www.w3.org/2000/01/rdf-schema#seeAlso> ?EntityURI.  {service <"+ep.endpoint+"> {select  distinct ?EntityURI { ?EntityURI a [] }} }. } limit "+n+" }.   service <"+ep.endpoint+"> { select ('"+ep.name+"' AS ?Endpoint) ?EntityURI ?Score ?EntityClass  ?EntityLabel  ?PropertyValue ?Property ?PropertyLabel ?Lang ?Type ?Year {\n";
+        sprql+="{ {select ?EntityURI { <"+URI+"> <http://www.w3.org/2000/01/rdf-schema#seeAlso> ?EntityURI.  {service <"+ep.endpoint+"> {select  distinct ?EntityURI { ?EntityURI a [] }} }. } limit "+n+" }.   service <"+ep.endpoint+"> { select ('"+ep.name+"' AS ?Endpoint) ?EntityURI ?Score ?EntityClass  ?EntityLabel  ?PropertyValue ?Property ?PropertyLabel (?Lang1 as ?Lang) (?Type1 as ?Type) (?Year1 as ?Year) {\n";
         
         sprql+="{\n";
         sprql+="select distinct ?EntityURI ?Score {  ?EntityURI a []. bind(1 as ?Score). }  \n";
@@ -1235,6 +1253,8 @@ desplegar2 = function (e) {
                 
                 sprql+="{\n";
                 sprql+="select * {\n";
+                
+                
                 
                 sprql+="?EntityURI a <"+cls.URI+">.\n";
                 sprql+="bind (IRI (<"+cls.URI+">) as ?EntityClass) .\n";
@@ -1274,7 +1294,7 @@ desplegar2 = function (e) {
             
         sprql+="}}}\n";    
         
-        if ( i!=ConfigInfo.Repositories.length-1){
+        if ( mm != con.length-1){
                     sprql+=" union ";
         }
         
