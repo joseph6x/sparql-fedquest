@@ -98,15 +98,21 @@
 					<hr id = "divrelated"  size="2">
 					<div class="listendpoints">
 						<ul id="sortable">
-							{{#each relatedresavailable}}
+                                                     
+                                                    {{#each LinksInfo}}
+                                                        <li Num="{{IN}}" EP="{{EP}}" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >{{EP}} <span id="amount{{IN}}" class="spanrel"> </span> <div id="slider-related{{IN}}" ></div><script> $(function(){ sliderfun("slider-related"+'{{IN}}','{{IN}}','{{MX}}'); }); </script></li>
+                                                    {{else}}
+                                                    
+                                                    {{/each}}
+							<!--{{#each relatedresavailable}}
 							 <li Num="{{@index}}" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >
 							 	{{name}} <span id="amount{{@index}}" class="spanrel"> </span> <div id="slider-related{{@index}}" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related{{@index}}','{{@index}}'); }); </script></li>
 
 
-							<!--  <li Num="1" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >Cepalstat <span id="amount1" class="spanrel"> </span> <div id="slider-related1" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related1','1'); }); </script></li>
+							  <li Num="1" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >Cepalstat <span id="amount1" class="spanrel"> </span> <div id="slider-related1" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related1','1'); }); </script></li>
   							  <li Num="2" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >Repositorio <span id="amount2" class="spanrel"> </span> <div id="slider-related2" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related2', '2'); }); </script></li>
-  							  <li Num="3" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >Biblioguias <span id="amount3" class="spanrel"> </span> <div id="slider-related3" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related3','3'); }); </script></li> -->
-  							  {{/each}}
+  							  <li Num="3" class="list-group-item"><img class="sorticon" src="/images/updown.png" width="15px" >Biblioguias <span id="amount3" class="spanrel"> </span> <div id="slider-related3" data-inf="[{'key': 1 , 'count':1}, {'key': 2 , 'count': 2} , {'key': 3 , 'count': 3}]" data-min="0" data-max="3"></div><script> $(function(){ sliderfun('slider-related3','3'); }); </script></li> 
+  							  {{/each}}-->
 						</ul>	
 					</div>	
 					<hr id = "divrelated" size="2">
@@ -282,7 +288,8 @@ el proceso en la publicación de LOD. </p>
 			<!--<span class="{{Icon}}"></span>-->
                         <img src="{{Icon}}" width=20px >
 			{{Origin}}
-			 <a href="#" title="Relacionados" class="qricon" datauri ="{{URI}}"  onclick="showrel('{{URI}}', '{{Label}}')"   ><img src="/images/qr.png" width=14px ></a> 
+			 <!--<a href="#" title="Relacionados" class="qricon" datauri ="{{URI}}"  onclick="showrel('{{URI}}', '{{Label}}')"   ><img src="/images/qr.png" width=14px ></a> -->
+                         <a href="#" title="Relacionados" class="qricon" datauri ="{{URI}}"  onclick="showrel('{{URI}}', '{{Label}}', '{{Origin}}')"   ><img src="/images/qr.png" width=14px ></a> 
 			 <span id="dwnload" class="glyphicon glyphicon-save" onclick="download('{{URI}}',)"> </span>
 			<!--<a href="#" class="qricon" onclick="alert ('hola');"  >o</a>  -->
 			  <!-- <button type="button"  class="qricon" data-toggle="modal"  onclick="qrmodalshow(event);" data-target="#myqrmodal"> </button>-->

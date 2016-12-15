@@ -2015,6 +2015,22 @@ if (Meteor.isClient) {
                 return "glyphicon glyphicon-chevron-down";
             }
 
+        }, LinksInfo: function (){
+            var r= Session.get('LinksInfo');
+            var URI= Session.get('LinksURI');
+            var OrgEP= Session.get('LinksEP');
+            var ob=[];
+            if (r!=undefined && URI!=undefined && OrgEP!=undefined && r!=null && URI!=null && OrgEP!=null){
+                
+                
+                for (var i=0; i<r.length; i++){
+                    if (Number (r[i].CO.value)>0){
+                        ob.push({EP:r[i].EP.value , MX:Number (r[i].CO.value), IN: i+1 });
+                    }
+                }
+            }
+            
+            return ob;
         }, DespFac: function () {
             var des = Session.get("DespFac");
             if (des) {
@@ -2042,35 +2058,48 @@ if (Meteor.isClient) {
           return r0; 
         },
         suggestedQueries: function () {
-
-            var EntitySearch = get_radio_value("opciones");
+ var ConfigInfo = Session.get('ConfigInfo');
+            var t__ = "T";
+                var EntitySearch = $('label[select="1"]').attr('tipo');
+                if (EntitySearch != undefined) {
+                    
+                    t__=EntitySearch;
+                }else{
+                    return [];
+                }
+            var cl=ConfigInfo.MainClasses.filter(function (a){
+                        return a.Name==EntitySearch;
+                    });
+            cl=cl[0];
+            //var EntitySearch = get_radio_value("opciones");
             var w = [];
             //    alert ("Adiios");
             var des = Session.get("DespSug");
+            w = loadQueryFirstNode(cl.URI);
             //  if (des){
-            switch (EntitySearch) {
-                case 'autores':
-                    w = loadQueryFirstNode('http://xmlns.com/foaf/0.1/Person');
+            //switch (EntitySearch) {
+              //  case 'autores':
+               //     w = loadQueryFirstNode('http://xmlns.com/foaf/0.1/Person');
 
                     //  Session.set('DespSug', true);
-                    break;
-                case 'documentos':
-                    w = loadQueryFirstNode('http://purl.org/ontology/bibo/Document');
+               //     break;
+              //  case 'documentos':
+              //      w = loadQueryFirstNode('http://purl.org/ontology/bibo/Document');
 
                     // Session.set('DespSug', true);
-                    break;
-                case 'colecciones':
-                    w = loadQueryFirstNode('http://purl.org/ontology/bibo/Collection');
-
-                    //  Session.set('DespSug', true);
-                    break;
-                default :
+               //     break;
+               // case 'colecciones':
+            //        w = loadQueryFirstNode('http://purl.org/ontology/bibo/Collection');
+//
+             //  /     //  Session.set('DespSug', true);
+             //       break;
+             //   default :
                     //  w = Queries.find().fetch();
                     //  $(".sugestion-panel").css ("min-height", "400px");
                     //$("#sug").collapse('show');
-                    //  Session.set('DespSug', false);
-                    break;
-            }
+           ///         //  Session.set('DespSug', false);
+            ///        break;
+           // }
             var aux = Session.get("auxAct");
             var TextSearch = $(".textToSearch").val();
             for (var q = 0; q < w.length; q++) {
