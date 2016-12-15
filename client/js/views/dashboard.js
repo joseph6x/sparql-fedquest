@@ -414,6 +414,7 @@ this.DashboardView = Backbone.View.extend({
                     var endpointIdprefix = rawNode ? ('raw_' + endpointObj.name) : endpointObj.name;
                     var _cfield = (childNode.attrs.text.text == childNode.attrs.text.label ? //no value specified
                             childNode.attrs.text.text : childNode.attrs.text.label) + '_' + endpointIdprefix;
+                    //childNode.attrs.text.text : childNode.attrs.text.label) + '_' + endpointIdprefix+_cstype;
                     var _cfieldValue = childNode.attrs.text.text;
 //JO
                     var applyRegexFilter1 = childNode.attrs.text.regex == '2';
@@ -487,6 +488,9 @@ this.DashboardView = Backbone.View.extend({
             this.parseQueryFields = function (endpoint, queryNodes, linkNodes, childsId, fields) {
 
                 _.each(childsId, function (childId) {
+                    console.log ("Links");
+                    console.log (linkNodes);
+                    console.log (queryNodes);
                     var subfields = _.filter(linkNodes, function (obj) {
                         return obj.source.id == childId
                     });
@@ -503,9 +507,7 @@ this.DashboardView = Backbone.View.extend({
                                 return obj.endpoint + '|' + obj.graphURI == childNode.endpoint + '|' + childNode.graphuri
                             });
                             if (childNode.rawNode) {
-                                var predicate = _.find(linkNodes, function (obj) {
-                                    return obj.target.id == childId
-                                });
+                              
                                 if (predicate.labels[0].attrs.text.text.match('^[?]')) {//predicate as variable
                                     fields.push(predicate.labels[0].attrs.text.text + '_raw_' + endpointObj.name);
                                 }
@@ -513,14 +515,110 @@ this.DashboardView = Backbone.View.extend({
                             }
                             //includes fields belonging to the current endpoint
                             else if (endpoint == endpointObj.endpoint + '|' + endpointObj.graphURI) {
+                                 console.log ("Fields");
+
                                 fields.push(childNode.attrs.text.text + '_' + endpointObj.name);
+                                console.log (fields);
+                                  console.log ("Target");
+                                  var pre = _.find(linkNodes, function (obj) {
+                                    return obj.target.id == childId
+                                  });
+                                    var tar = _.find(queryNodes, function (obj) {
+                                    return obj.id == pre.source.id;
+                                     });
+
+                                    var sor = _.find(queryNodes, function (obj) {
+                                    return obj.id == pre.target.id;
+                                     });
+
+                               
+                                  console.log (pre);
+                                  console.log (sor);
+
                             }
                         }
                     }
 
                 });
                 return fields;
-            };
+            }; 
+
+              function change (nodes , links ) {
+                  var relations = [];
+                  var hashentity = {};
+                _.each(nodes, function (node) { 
+                 console.log ("Búsqueda");
+                 console.log (node.id);
+                  var newname = '';
+                 var sourcename = node.attrs.text.label;
+                  
+                  if (hashentity.hasOwnProperty(sourcename) ){
+                  //  if (hashentity[sourcename]['id']!= node.id ) {
+                     var n = hashentity[sourcename]['N'];
+                     var newname = sourcename+(n+1);
+                     hashentity[sourcename]['N'] =  n+1;
+                      //hashentity[newname] = {'id': node.id , 'N': n+1};
+                    /*  } else {
+                        newname = node.attrs.text.label;
+                      }*/
+                 } else {
+                   //  hashentity[sourcename] = {'id': node.id , 'N': 0};
+                   hashentity[sourcename] = {'N': 0};
+                     newname =  sourcename ;
+                 }
+
+                 var targetname = "" ;
+                 var targettext = "" ;
+
+
+                 var pre = _.find(links , function (obj) {
+                                    return obj.target.id == node.id
+                });
+                 
+                 console.log (pre);
+                 if (! (typeof pre === 'undefined' )){
+                    console.log ("Buscando Target");
+                    
+                var tar = _.find(nodes, function (obj) {
+                                return obj.id == pre.source.id;
+                                console.log (pre.source.id);
+                 });
+                 targetname = tar.attrs.text.label;
+                 targettext = tar.attrs.text.text;
+                 console.log (tar);
+                 console.log (targetname);
+                 var names = { "ids": node.id , "sourcen": sourcename , "idt": pre.source.id , "targetname": targetname };
+                 //node.attrs.text.textaux = sourcename+targetname.replace("?","");
+               //  node.attrs.text.labelaux =  sourcename+targetname.replace("?",""); //
+                            node.attrs.text.labelaux =  newname;
+                       if ( node.attrs.text.regex == 0 ){
+                     //   node.attrs.text.textaux = sourcename+targettext.replace("?","");
+                        node.attrs.text.textaux=  newname;
+                       }
+
+                  relations.push (names);
+                  }
+
+                 } );
+
+
+               _.each(nodes, function (node) { 
+                  if (! (typeof  node.attrs.text.labelaux  === 'undefined') )
+                  //node.attrs.text.text =   node.attrs.text.textaux;
+                    if ( node.attrs.text.regex == 0 && node.attrs.text.text == node.attrs.text.label ){
+                  node.attrs.text.text =   node.attrs.text.textaux;
+                  }
+
+
+                  node.attrs.text.label  =   node.attrs.text.labelaux;
+               
+                 });
+
+                console.log (relations);
+                console.log ("Changed");
+                console.log (nodes);
+                return nodes;
+            }
 
             ///////////////////////////////////
             //////// Node to SPARQL Parser/////
@@ -534,6 +632,8 @@ this.DashboardView = Backbone.View.extend({
                     }).show();
                 } else {
                     var jsonQuery = App.dashboard.graph.toJSON();
+                    console.log ("JSON");
+                    console.log (jsonQuery);
                     var queryNodes = _.filter(jsonQuery.cells, function (obj) {
                         return obj.type == 'html.Element'
                     });
@@ -541,6 +641,7 @@ this.DashboardView = Backbone.View.extend({
                     var linkNodes = _.filter(jsonQuery.cells, function (obj) {
                         return obj.type == 'link'
                     });
+                    queryNodes = change (queryNodes , linkNodes);
                     var endpoints = Session.get('endpoints');
                     var queryCount = 0;
                     var queryList = [];
@@ -549,6 +650,8 @@ this.DashboardView = Backbone.View.extend({
                         rootNode.endpoint = endpointBase.endpoint;
                         rootNode.graphuri = endpointBase.graphURI;
                     }
+                    console.log ("Endpoints");
+                    console.log (queryNodes);
                     _.each(endpoints, function (objEndpoint) {
                         var fields = [];
                         var triples = [];
@@ -572,9 +675,12 @@ this.DashboardView = Backbone.View.extend({
                                     return obj.source.id == node.id
                                 });
                                 nodeLinks = _.pluck(_.pluck(nodeLinks, 'target'), 'id');
+                                
                                 entities = _.union(entities, _.filter(endpointNodes, function (obj) {
                                     return _.contains(nodeLinks, obj.id)
                                 }));
+                                 //console.log (nodeLinks);
+
                             }
 
                         });
@@ -591,6 +697,8 @@ this.DashboardView = Backbone.View.extend({
                                 var _id = obj.id;
                                 var _type = obj.subject;
                                 var _entityField = (obj.rawNode ? '' : '?') + obj.attrs.text.text;
+                                console.log ("Entity");
+                                console.log (_entityField);
                                 //query.field(_entityField);
                                 _entityField += '_' + (obj.rawNode ? ('raw_' + objEndpoint.name) : objEndpoint.name);
                                 fields.push(_entityField);
@@ -827,6 +935,7 @@ this.DashboardView = Backbone.View.extend({
     //set Dashboard View Events//
     /////////////////////////////
     setEvents: function (divNode) {
+    
 
         App.dashboard.takeSnapshot = function (targetElem) {
             // First render all SVGs to canvases

@@ -1396,6 +1396,9 @@ if (Meteor.isClient) {
 
 
     Template.dashboard.helpers({
+         tableSettings: function () {
+           return {currentPage: 0};
+        },
         endpointsAvailable: function () {
             return Endpoints.find({status: 'A'}).fetch();
         },
@@ -1552,6 +1555,7 @@ if (Meteor.isClient) {
                         //   console.log (entidadesrel); 
                         //  graph.endpointProperties[j].enti = entidadestext ;
                         var name = graph.endpointProperties[j].name;
+
                         if (name.length > 10) {
                             graph.endpointProperties[j].dim = "col-xs-10 col-sm-8 col-md-6";
                         } else {
